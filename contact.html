@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .page-header { padding: 10rem 0 4rem; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        
+        .contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        .contact-info-card { background: var(--bg-card); border: 1px solid var(--glass-border); padding: 3rem; border-radius: var(--radius-lg); }
+        .info-item { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
+        .info-icon { width: 50px; height: 50px; border-radius: 50%; background: rgba(109, 40, 217, 0.2); color: var(--accent-1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .info-text h4 { margin-bottom: 0.2rem; }
+        .info-text p { color: var(--text-muted); font-size: 0.95rem; }
+        
+        .contact-form { background: var(--bg-card); border: 1px solid var(--glass-border); padding: 3rem; border-radius: var(--radius-lg); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        textarea.form-input { min-height: 150px; resize: vertical; }
+        
+        .map-placeholder { width: 100%; height: 400px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin-bottom: 6rem; position: relative; overflow: hidden; }
+        .map-placeholder::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 20px, transparent 20px, transparent 40px); }
+        .map-marker { font-size: 3rem; color: var(--accent-3); position: relative; z-index: 2; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        
+        .faq-section { max-width: 800px; margin: 0 auto 6rem; }
+        .faq-item { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-md); margin-bottom: 1rem; overflow: hidden; }
+        .faq-header { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-family: var(--font-primary); }
+        .faq-header:hover { background: rgba(255,255,255,0.02); }
+        .faq-body { padding: 0 1.5rem 1.5rem; color: var(--text-muted); font-size: 0.95rem; display: none; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; padding-top: 1rem; }
+        .faq-item.active .faq-body { display: block; }
+        .faq-item.active .faq-header i { transform: rotate(180deg); }
+        
+        @media (max-width: 768px) {
+            .contact-layout { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+    <div class="aurora-bg"><div class="glow-3"></div></div>
+
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="collections.html">Collections</a></li>
+                <li><a href="artists.html">Artists</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline magnetic-btn">Login</a>
+                <a href="signup.html" class="btn btn-gradient-border magnetic-btn"><span>Sign Up</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-header container reveal">
+        <h1>Get in <span class="text-gradient">Touch</span></h1>
+        <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Have a question about an artwork, need help setting up your wallet, or just want to say hi? We're here for you.</p>
+    </div>
+
+    <main class="container">
+        <div class="contact-layout reveal stagger-1">
+            <!-- Contact Info -->
+            <div class="contact-info-card tilt-card">
+                <div class="tilt-card-inner">
+                    <h2 style="margin-bottom: 2rem;">Contact Information</h2>
+                    <div class="info-item">
+                        <div class="info-icon"><i class="uil uil-envelope"></i></div>
+                        <div class="info-text">
+                            <h4>Email Us</h4>
+                            <p>support@stackly.art</p>
+                            <p>partnerships@stackly.art</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-map-marker"></i></div>
+                        <div class="info-text">
+                            <h4>Our Headquarters</h4>
+                            <p>101 Web3 Avenue, Suite 500<br>San Francisco, CA 94107<br>United States</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-phone"></i></div>
+                        <div class="info-text">
+                            <h4>Call Us</h4>
+                            <p>+1 (555) 123-4567</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Mon-Fri from 9am to 6pm PST</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 3rem;">
+                        <h4 style="margin-bottom: 1rem;">Follow Us</h4>
+                        <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                            <a href="404.html" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);"><i class="uil uil-twitter"></i></a>
+                            <a href="404.html" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);"><i class="uil uil-discord"></i></a>
+                            <a href="404.html" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);"><i class="uil uil-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form tilt-card">
+                <div class="tilt-card-inner">
+                    <h2 style="margin-bottom: 2rem;">Send a Message</h2>
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-input" placeholder="John" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-input" placeholder="Doe" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select">
+                                <option>General Inquiry</option>
+                                <option>Technical Support</option>
+                                <option>Billing</option>
+                                <option>Partnership</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-input" placeholder="How can we help you?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary magnetic-btn" style="width: 100%;">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Placeholder -->
+        <div class="map-placeholder reveal">
+            <i class="uil uil-map-marker map-marker"></i>
+            <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; z-index: 2;">Interactive Map Disabled in Preview</div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq-section reveal">
+            <h2 style="text-align: center; margin-bottom: 3rem;">Frequently Asked <span class="text-gradient">Questions</span></h2>
+            
+            <div class="faq-item">
+                <div class="faq-header">What is Stackly? <i class="uil uil-angle-down"></i></div>
+                <div class="faq-body">Stackly is a premium decentralized marketplace where users can discover, collect, and sell digital art. We utilize blockchain technology to verify ownership and ensure creators receive royalties on secondary sales.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-header">How do I set up a wallet? <i class="uil uil-angle-down"></i></div>
+                <div class="faq-body">You can set up a wallet using popular providers like MetaMask, Coinbase Wallet, or WalletConnect. Once installed, simply click the "Login" button and follow the prompts to connect it to our platform.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-header">What fees does Stackly charge? <i class="uil uil-angle-down"></i></div>
+                <div class="faq-body">We charge a flat 2% fee on all primary and secondary sales to maintain the platform. Gas fees required by the blockchain are separate and paid directly to network miners.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-header">How do I apply as an Artist? <i class="uil uil-angle-down"></i></div>
+                <div class="faq-body">Go to the Signup page and select "Artist" as your role. Our curation team reviews all applications to ensure high-quality standards across the marketplace. You will hear back within 48 hours.</div>
+            </div>
+        </div>
+        
+        <!-- Newsletter -->
+        <div class="reveal" style="background: var(--gradient-primary); padding: 4rem; border-radius: var(--radius-lg); text-align: center; margin-bottom: 4rem;">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <h2 style="margin-bottom: 1rem;">Join our Newsletter</h2>
+                <p style="color: white; margin-bottom: 2rem;">Get the latest updates on new features, artist drops, and industry news directly in your inbox.</p>
+                <form style="display: flex; gap: 1rem;">
+                    <input type="email" class="form-input" placeholder="Your email address" style="flex: 1; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white;" required>
+                    <button type="submit" class="btn magnetic-btn" style="background: white; color: var(--accent-1);">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
+                        <img src="lo.webp" alt="Stackly Logo">
+                    </a>
+                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
+                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">All Artworks</a></li>
+                        <li><a href="#">New Releases</a></li>
+                        <li><a href="#">Top Artists</a></li>
+                        <li><a href="#">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>My Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Profile</a></li>
+                        <li><a href="#">Favorites</a></li>
+                        <li><a href="#">My Collections</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stackly. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // FAQ Interaction
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqHeaders = document.querySelectorAll('.faq-header');
+            faqHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const item = header.parentElement;
+                    item.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

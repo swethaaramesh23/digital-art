@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Dashboard | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        body { background-color: var(--bg-darker); }
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px; background: rgba(20,20,25,0.8); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
+            position: fixed; height: 100vh; z-index: 100;
+        }
+        .sidebar-header { padding: 2rem; border-bottom: 1px solid var(--glass-border); }
+        .sidebar-menu { flex: 1; padding: 2rem 1rem; overflow-y: auto; }
+        .sidebar-menu::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+            color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;
+            transition: var(--transition-fast);
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .sidebar-menu a.active { border-left: 3px solid var(--accent-1); }
+        .sidebar-footer { padding: 2rem; border-top: 1px solid var(--glass-border); }
+        .sidebar-profile { display: flex; align-items: center; gap: 1rem; }
+        .sidebar-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .main-content { flex: 1; margin-left: 280px; padding: 2rem 3rem; display: flex; flex-direction: column; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg); padding: 2rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
+        .chart-container { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2rem; }
+        .mock-chart { width: 100%; height: 250px; background: repeating-linear-gradient(0deg, transparent, transparent 49px, var(--glass-border) 50px); position: relative; margin-top: 1.5rem; display: flex; align-items: flex-end; justify-content: space-around; padding-top: 2rem; }
+        .bar { width: 8%; background: var(--gradient-primary); border-radius: 5px 5px 0 0; transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .activity-timeline { margin-top: 2rem; }
+        .activity-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .activity-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(109, 40, 217, 0.2); color: var(--accent-1); display: flex; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+
+    <div class="dashboard-layout">
+        <!-- Artist Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 1rem 0 0.5rem 1.5rem; color: var(--text-muted);">Creator</p>
+                <a href="#dashboard" class="active"><i class="uil uil-chart-line"></i> Dashboard</a>
+                <a href="#upload"><i class="uil uil-cloud-upload"></i> Upload Artwork</a>
+                <a href="#artworks"><i class="uil uil-image"></i> My Artworks</a>
+                <a href="#sales"><i class="uil uil-bill"></i> Sales Analytics</a>
+                <a href="#revenue"><i class="uil uil-dollar-alt"></i> Revenue</a>
+                <a href="#followers"><i class="uil uil-users-alt"></i> Followers</a>
+                
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 2rem 0 0.5rem 1.5rem; color: var(--text-muted);">Account</p>
+                <a href="#messages"><i class="uil uil-envelope"></i> Messages</a>
+                <a href="#orders"><i class="uil uil-receipt"></i> Orders</a>
+                <a href="#reviews"><i class="uil uil-star"></i> Reviews</a>
+                <a href="#profile"><i class="uil uil-user"></i> Profile</a>
+                <a href="#settings"><i class="uil uil-setting"></i> Settings</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-profile">
+                    <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Artist">
+                    <div style="flex: 1;"><h5 style="margin: 0; font-size: 0.95rem;">Marcus Vance</h5><p style="margin: 0; font-size: 0.8rem;">Artist</p></div>
+                    <a href="index.html" style="color: var(--accent-3);"><i class="uil uil-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header reveal">
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+                    <div><h2 style="margin: 0;">Artist Dashboard</h2><p style="margin: 0; font-size: 0.9rem;">Overview of your creative portfolio.</p></div>
+                </div>
+                <button class="btn btn-primary magnetic-btn"><i class="uil uil-plus"></i> Create New</button>
+            </header>
+
+            <div id="dashboard" class="tab-content active-tab">
+            <div class="grid-3 reveal stagger-1">
+                <div class="stat-card tilt-card">
+                    <div class="tilt-card-inner">
+                        <p style="margin-bottom: 0.5rem;">Total Sales</p><h2 style="margin: 0;">124 ETH</h2>
+                    </div>
+                    <div class="stat-icon" style="background: rgba(109, 40, 217, 0.2); color: var(--accent-1);"><i class="uil uil-dollar-alt"></i></div>
+                </div>
+                <div class="stat-card tilt-card">
+                    <div class="tilt-card-inner">
+                        <p style="margin-bottom: 0.5rem;">Total Views</p><h2 style="margin: 0;">45.2K</h2>
+                    </div>
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-eye"></i></div>
+                </div>
+                <div class="stat-card tilt-card">
+                    <div class="tilt-card-inner">
+                        <p style="margin-bottom: 0.5rem;">Followers</p><h2 style="margin: 0;">8.2K</h2>
+                    </div>
+                    <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-users-alt"></i></div>
+                </div>
+            </div>
+
+            <div class="grid-2 reveal stagger-2" style="margin-top: 3rem;">
+                <div class="chart-container">
+                    <h3 style="margin: 0;">Revenue Analytics</h3>
+                    <div class="mock-chart">
+                        <div class="bar" style="height: 30%;"></div><div class="bar" style="height: 50%;"></div>
+                        <div class="bar" style="height: 20%;"></div><div class="bar" style="height: 70%;"></div>
+                        <div class="bar" style="height: 40%;"></div><div class="bar" style="height: 90%;"></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin: 0;">Recent Activity</h3>
+                    <div class="activity-timeline">
+                        <div class="activity-item">
+                            <div class="activity-icon"><i class="uil uil-shopping-cart"></i></div>
+                            <div><h5 style="margin: 0;">Art Sold</h5><p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">"Neon Genesis" sold for 2.5 ETH</p></div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-user-plus"></i></div>
+                            <div><h5 style="margin: 0;">New Follower</h5><p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">@crypto_king started following you</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            
+            <!-- Other Tabs Placeholder -->
+            <div id="portfolio" class="tab-content"><h2 style="margin-bottom: 2rem;">Portfolio</h2><p style="color: var(--text-muted);">Manage your artworks here.</p></div>
+            <div id="sales" class="tab-content"><h2 style="margin-bottom: 2rem;">Sales</h2><p style="color: var(--text-muted);">View detailed sales analytics.</p></div>
+            <div id="analytics" class="tab-content"><h2 style="margin-bottom: 2rem;">Analytics</h2><p style="color: var(--text-muted);">Deep dive into profile statistics.</p></div>
+            <div id="earnings" class="tab-content"><h2 style="margin-bottom: 2rem;">Earnings & Payouts</h2><p style="color: var(--text-muted);">Manage your revenue and withdrawals.</p></div>
+            <div id="messages" class="tab-content"><h2 style="margin-bottom: 2rem;">Messages</h2><p style="color: var(--text-muted);">Inbox is empty.</p></div>
+            <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">Settings</h2><p style="color: var(--text-muted);">Artist profile settings.</p></div>
+
+        </main>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const bars = document.querySelectorAll('.bar');
+                bars.forEach(bar => {
+                    const h = bar.style.height;
+                    bar.style.height = '0%';
+                    setTimeout(() => { bar.style.height = h; }, 100);
+                });
+            }, 600);
+        });
+    </script>
+</body>
+</html>

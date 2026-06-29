@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .page-header { padding: 10rem 0 4rem; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border); flex-wrap: wrap; gap: 1rem;}
+        .filter-group { display: flex; gap: 1rem; align-items: center; }
+        .marketplace-layout { display: flex; gap: 2rem; align-items: flex-start; }
+        .sidebar-filters { width: 250px; flex-shrink: 0; background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--glass-border); position: sticky; top: 100px; }
+        .filter-section { margin-bottom: 2rem; }
+        .filter-section h4 { margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; }
+        .checkbox-group { display: flex; flex-direction: column; gap: 0.8rem; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-secondary); font-size: 0.9rem; cursor: pointer; color: var(--text-muted); transition: var(--transition-fast); }
+        .checkbox-label:hover { color: white; }
+        .price-inputs { display: flex; gap: 0.5rem; align-items: center; }
+        .price-inputs input { width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; border-radius: var(--radius-sm); font-family: var(--font-secondary); }
+        .art-grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        
+        .horizontal-section { margin-top: 6rem; }
+        .horizontal-scroll { display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 1.5rem; scrollbar-width: none; }
+        .horizontal-scroll .card { min-width: 300px; }
+        
+        @media (max-width: 1024px) {
+            .marketplace-layout { flex-direction: column; }
+            .sidebar-filters { width: 100%; position: static; }
+            .art-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .art-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+
+    <div class="aurora-bg"><div class="glow-3"></div></div>
+
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html" class="active">Marketplace</a></li>
+                <li><a href="collections.html">Collections</a></li>
+                <li><a href="artists.html">Artists</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline magnetic-btn">Login</a>
+                <a href="signup.html" class="btn btn-gradient-border magnetic-btn"><span>Sign Up</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-header container reveal">
+        <h1>Explore <span class="text-gradient">Marketplace</span></h1>
+        <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Discover, collect, and sell extraordinary digital art and NFTs.</p>
+    </div>
+
+    <main class="container">
+        <div class="filter-bar reveal">
+            <div class="filter-group">
+                <button class="btn btn-outline"><i class="uil uil-filter"></i> Filters</button>
+                <div class="search-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: var(--radius-full); display: flex; gap: 0.8rem; width: 300px;">
+                    <i class="uil uil-search" style="color: var(--text-muted);"></i>
+                    <input type="text" placeholder="Search items, collections..." style="background: transparent; border: none; color: white; outline: none; width: 100%;">
+                </div>
+            </div>
+            <div class="filter-group">
+                <select class="form-select" style="width: auto; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: var(--radius-full);">
+                    <option>Recently Added</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Most Favorited</option>
+                </select>
+                <div style="display: flex; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 0.2rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
+                    <button style="background: var(--bg-dark); border: none; color: white; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"><i class="uil uil-apps"></i></button>
+                    <button style="background: transparent; border: none; color: var(--text-muted); padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"><i class="uil uil-list-ul"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="marketplace-layout reveal stagger-1">
+            <aside class="sidebar-filters tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="filter-section">
+                        <h4>Status</h4>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox"> Buy Now</label>
+                            <label class="checkbox-label"><input type="checkbox"> On Auction</label>
+                            <label class="checkbox-label"><input type="checkbox"> New</label>
+                        </div>
+                    </div>
+                    <div class="filter-section">
+                        <h4>Price Range (ETH)</h4>
+                        <div class="price-inputs">
+                            <input type="number" placeholder="Min">
+                            <span style="color: var(--text-muted);">to</span>
+                            <input type="number" placeholder="Max">
+                        </div>
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 1rem; padding: 0.5rem;">Apply</button>
+                    </div>
+                    <div class="filter-section">
+                        <h4>Categories</h4>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox"> Art (1,245)</label>
+                            <label class="checkbox-label"><input type="checkbox"> Photography (843)</label>
+                            <label class="checkbox-label"><input type="checkbox"> Gaming (521)</label>
+                            <label class="checkbox-label"><input type="checkbox"> Metaverse (214)</label>
+                            <label class="checkbox-label"><input type="checkbox"> Music (105)</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="art-grid">
+                <!-- Card 1 -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Place Bid</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Cyberpunk Genesis</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @neon_god</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="text-gradient" style="font-weight: 700;">2.5 ETH</span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="uil uil-heart"></i> 452</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Abstract Dimensions</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @creative_mind</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="text-gradient" style="font-weight: 700;">1.2 ETH</span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="uil uil-heart"></i> 324</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Place Bid</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Digital Harmony</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @art_bot</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="text-gradient" style="font-weight: 700;">3.5 ETH</span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="uil uil-heart"></i> 542</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Neon Genesis</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @synthwave</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="text-gradient" style="font-weight: 700;">0.8 ETH</span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="uil uil-heart"></i> 189</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Place Bid</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Future Worlds</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @visionary</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="text-gradient" style="font-weight: 700;">0.5 ETH</span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="uil uil-heart"></i> 122</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1633398813350-98fc1a7707c7?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Golden Ratio</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @math_art</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="text-gradient" style="font-weight: 700;">1.8 ETH</span>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;"><i class="uil uil-heart"></i> 890</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended Artworks -->
+        <div class="horizontal-section reveal">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                <h2>Recommended For You</h2>
+                <a href="#" class="btn btn-outline magnetic-btn">View All</a>
+            </div>
+            <div class="horizontal-scroll">
+                <!-- Horizontal Cards -->
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=400&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Prism Light</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @color_master</p>
+                            <span class="text-gradient" style="font-weight: 700;">1.1 ETH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Liquid Flow</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @fluid_dynamics</p>
+                            <span class="text-gradient" style="font-weight: 700;">0.9 ETH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=400&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Geometric Soul</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @shapes</p>
+                            <span class="text-gradient" style="font-weight: 700;">2.1 ETH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=400&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Lost City</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @urban_myth</p>
+                            <span class="text-gradient" style="font-weight: 700;">4.0 ETH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
+                        <img src="lo.webp" alt="Stackly Logo">
+                    </a>
+                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
+                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">All Artworks</a></li>
+                        <li><a href="#">New Releases</a></li>
+                        <li><a href="#">Top Artists</a></li>
+                        <li><a href="#">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>My Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Profile</a></li>
+                        <li><a href="#">Favorites</a></li>
+                        <li><a href="#">My Collections</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stackly. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

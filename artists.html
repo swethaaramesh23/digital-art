@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artists | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .page-header { padding: 10rem 0 6rem; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        
+        .artist-spotlight { display: flex; align-items: center; gap: 4rem; background: var(--bg-card); border-radius: var(--radius-lg); padding: 4rem; margin-bottom: 6rem; border: 1px solid var(--glass-border); }
+        .spotlight-img { flex: 1; border-radius: var(--radius-md); overflow: hidden; position: relative; }
+        .spotlight-img img { width: 100%; display: block; }
+        .spotlight-content { flex: 1; }
+        
+        .artist-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow: hidden; text-align: center; padding-bottom: 2rem; }
+        .artist-banner { height: 120px; background: var(--gradient-primary); }
+        .artist-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+        .artist-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg-card); margin: -50px auto 1rem; position: relative; z-index: 2; object-fit: cover; }
+        .artist-stats { display: flex; justify-content: space-around; margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .stat-box h4 { margin: 0; font-size: 1.1rem; }
+        .stat-box p { margin: 0; font-size: 0.8rem; }
+        
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 6rem; }
+        .cat-card { background: var(--bg-card); border: 1px solid var(--glass-border); padding: 2rem; border-radius: var(--radius-md); text-align: center; transition: var(--transition-fast); }
+        .cat-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
+        .cat-icon { font-size: 2.5rem; color: var(--accent-1); margin-bottom: 1rem; }
+        
+        @media (max-width: 768px) {
+            .artist-spotlight { flex-direction: column; padding: 2rem; }
+            .category-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+
+    <div class="aurora-bg"><div class="glow-3"></div></div>
+
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="collections.html">Collections</a></li>
+                <li><a href="artists.html" class="active">Artists</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline magnetic-btn">Login</a>
+                <a href="signup.html" class="btn btn-gradient-border magnetic-btn"><span>Sign Up</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-header container reveal">
+        <h1>Meet the <span class="text-gradient">Creators</span></h1>
+        <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Discover the brilliant minds behind the world's most exclusive digital art.</p>
+    </div>
+
+    <main class="container">
+        <!-- Spotlight -->
+        <div class="artist-spotlight reveal tilt-card">
+            <div class="tilt-card-inner" style="display: flex; gap: 4rem; width: 100%; align-items: center;">
+                <div class="spotlight-img">
+                    <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=600&auto=format&fit=crop" alt="Artwork">
+                </div>
+                <div class="spotlight-content">
+                    <div style="display: inline-block; padding: 0.3rem 1rem; background: rgba(109, 40, 217, 0.2); color: var(--accent-1); border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem;">Creator Spotlight</div>
+                    <h2 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Elena Rostova</h2>
+                    <p style="color: var(--accent-2); margin-bottom: 1.5rem;">@elena_creates</p>
+                    <p style="margin-bottom: 2rem;">A visionary digital artist from Berlin, blending futuristic cyberpunk elements with classical renaissance lighting techniques. Her latest collection "Neon Genesis" sold out in under 3 minutes.</p>
+                    <div style="display: flex; gap: 2rem; margin-bottom: 2.5rem;">
+                        <div>
+                            <h3 style="margin: 0;">1.2K</h3>
+                            <p style="margin: 0; font-size: 0.8rem;">Artworks</p>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0;">85K</h3>
+                            <p style="margin: 0; font-size: 0.8rem;">Followers</p>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0;">450 ETH</h3>
+                            <p style="margin: 0; font-size: 0.8rem;">Volume</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary magnetic-btn">Follow Artist</button>
+                    <button class="btn btn-outline magnetic-btn">View Collection</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <h3 class="reveal" style="margin-bottom: 2rem; text-align: center;">Explore by Speciality</h3>
+        <div class="category-grid reveal stagger-1">
+            <div class="cat-card tilt-card"><div class="tilt-card-inner"><i class="uil uil-pen cat-icon"></i><h4>Illustration</h4><p>2,450 Artists</p></div></div>
+            <div class="cat-card tilt-card"><div class="tilt-card-inner"><i class="uil uil-cube cat-icon"></i><h4>3D Modeling</h4><p>1,240 Artists</p></div></div>
+            <div class="cat-card tilt-card"><div class="tilt-card-inner"><i class="uil uil-camera cat-icon"></i><h4>Photography</h4><p>3,100 Artists</p></div></div>
+            <div class="cat-card tilt-card"><div class="tilt-card-inner"><i class="uil uil-processor cat-icon"></i><h4>AI Art</h4><p>890 Artists</p></div></div>
+        </div>
+
+        <!-- Top Creators Grid -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;" class="reveal">
+            <h2>Top <span class="text-gradient">Creators</span></h2>
+            <select class="form-select" style="width: auto; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: var(--radius-full);">
+                <option>All Time</option>
+                <option>This Month</option>
+                <option>This Week</option>
+            </select>
+        </div>
+
+        <div class="grid-4 reveal stagger-2">
+            <!-- Artist 1 -->
+            <div class="artist-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                    <h4 style="margin-bottom: 0.2rem;">Jane Doe</h4>
+                    <p style="font-size: 0.85rem; color: var(--accent-1);">@janedoe</p>
+                    <div class="artist-stats">
+                        <div class="stat-box"><h4>45.2K</h4><p>Followers</p></div>
+                        <div class="stat-box"><h4>120 ETH</h4><p>Volume</p></div>
+                    </div>
+                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
+                </div>
+            </div>
+            
+            <!-- Artist 2 -->
+            <div class="artist-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                    <h4 style="margin-bottom: 0.2rem;">Marcus Vance</h4>
+                    <p style="font-size: 0.85rem; color: var(--accent-1);">@marcus_v</p>
+                    <div class="artist-stats">
+                        <div class="stat-box"><h4>32.1K</h4><p>Followers</p></div>
+                        <div class="stat-box"><h4>98 ETH</h4><p>Volume</p></div>
+                    </div>
+                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
+                </div>
+            </div>
+
+            <!-- Artist 3 -->
+            <div class="artist-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                    <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                    <h4 style="margin-bottom: 0.2rem;">Sarah Chen</h4>
+                    <p style="font-size: 0.85rem; color: var(--accent-1);">@sarah_art</p>
+                    <div class="artist-stats">
+                        <div class="stat-box"><h4>28.5K</h4><p>Followers</p></div>
+                        <div class="stat-box"><h4>75 ETH</h4><p>Volume</p></div>
+                    </div>
+                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
+                </div>
+            </div>
+
+            <!-- Artist 4 -->
+            <div class="artist-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                    <h4 style="margin-bottom: 0.2rem;">David Kim</h4>
+                    <p style="font-size: 0.85rem; color: var(--accent-1);">@dk_designs</p>
+                    <div class="artist-stats">
+                        <div class="stat-box"><h4>22.3K</h4><p>Followers</p></div>
+                        <div class="stat-box"><h4>45 ETH</h4><p>Volume</p></div>
+                    </div>
+                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Join CTA -->
+        <div class="reveal" style="margin-top: 6rem; background: var(--glass-bg); padding: 4rem; border-radius: var(--radius-lg); text-align: center; border: 1px solid var(--glass-border);">
+            <h2 style="margin-bottom: 1rem;">Are you an artist?</h2>
+            <p style="max-width: 600px; margin: 0 auto 2rem;">Join our marketplace to mint your own digital artworks, build your community, and earn revenue securely on the blockchain.</p>
+            <a href="signup.html" class="btn btn-primary magnetic-btn" style="padding: 1rem 3rem;">Become a Creator</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
+                        <img src="lo.webp" alt="Stackly Logo">
+                    </a>
+                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
+                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">All Artworks</a></li>
+                        <li><a href="#">New Releases</a></li>
+                        <li><a href="#">Top Artists</a></li>
+                        <li><a href="#">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>My Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Profile</a></li>
+                        <li><a href="#">Favorites</a></li>
+                        <li><a href="#">My Collections</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stackly. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

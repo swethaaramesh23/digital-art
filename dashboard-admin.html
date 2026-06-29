@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        body { background-color: var(--bg-darker); }
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px; background: rgba(20,20,25,0.8); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
+            position: fixed; height: 100vh; z-index: 100;
+        }
+        .sidebar-header { padding: 2rem; border-bottom: 1px solid var(--glass-border); }
+        .sidebar-menu { flex: 1; padding: 2rem 1rem; overflow-y: auto; }
+        .sidebar-menu::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+            color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;
+            transition: var(--transition-fast);
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .sidebar-menu a.active { border-left: 3px solid var(--accent-1); }
+        .sidebar-footer { padding: 2rem; border-top: 1px solid var(--glass-border); }
+        .sidebar-profile { display: flex; align-items: center; gap: 1rem; }
+        .sidebar-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .main-content { flex: 1; margin-left: 280px; padding: 2rem 3rem; display: flex; flex-direction: column; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg); padding: 2rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
+        
+        /* Table Styles */
+        .table-container { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2rem; overflow-x: auto; margin-top: 2rem;}
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { font-family: var(--font-secondary); color: var(--text-muted); font-weight: 500; font-size: 0.9rem; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .status { padding: 0.3rem 0.8rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; }
+        .status.active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status.pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+
+    <div class="dashboard-layout">
+        <!-- Admin Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 1rem 0 0.5rem 1.5rem; color: var(--text-muted);">Admin Panel</p>
+                <a href="#dashboard" class="active"><i class="uil uil-apps"></i> Dashboard</a>
+                <a href="#users"><i class="uil uil-users-alt"></i> Manage Users</a>
+                <a href="#artists"><i class="uil uil-palette"></i> Manage Artists</a>
+                <a href="#artworks"><i class="uil uil-image"></i> Manage Artworks</a>
+                <a href="#collections"><i class="uil uil-layer-group"></i> Manage Collections</a>
+                <a href="#orders"><i class="uil uil-receipt"></i> Orders</a>
+                
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 2rem 0 0.5rem 1.5rem; color: var(--text-muted);">System</p>
+                <a href="#reports"><i class="uil uil-file-alt"></i> Reports</a>
+                <a href="#analytics"><i class="uil uil-chart-pie"></i> Analytics</a>
+                <a href="#notifications"><i class="uil uil-bell"></i> Notifications</a>
+                <a href="#settings"><i class="uil uil-setting"></i> Site Settings</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-profile">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=100&auto=format&fit=crop" alt="Admin">
+                    <div style="flex: 1;"><h5 style="margin: 0; font-size: 0.95rem;">Admin User</h5><p style="margin: 0; font-size: 0.8rem;">Super Admin</p></div>
+                    <a href="index.html" style="color: var(--accent-3);"><i class="uil uil-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header reveal">
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo" style="width: 40px;"></a>
+                    <div><h2 style="margin: 0;">Admin Control Panel</h2><p style="margin: 0; font-size: 0.9rem;">System status and platform management.</p></div>
+                </div>
+                <div class="search-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.5rem; border-radius: var(--radius-full); display: flex; gap: 0.8rem; width: 300px;">
+                    <i class="uil uil-search" style="color: var(--text-muted);"></i>
+                    <input type="text" placeholder="Search ID or User..." style="background: transparent; border: none; color: white; outline: none; width: 100%;">
+                </div>
+            </header>
+
+            <div id="dashboard" class="tab-content active-tab">
+                <div class="grid-4 reveal stagger-1">
+                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Total Users</p><h3 style="margin: 0;">125.4K</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Total Artists</p><h3 style="margin: 0;">8.2K</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Platform Volume</p><h3 style="margin: 0;">$4.5M</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Active Disputes</p><h3 style="margin: 0; color: var(--accent-3);">12</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container reveal stagger-2">
+                    <h3 style="margin-bottom: 1.5rem;">Recent Platform Activity</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@jane_doe</td>
+                                <td>Minted NFT "Neon 1"</td>
+                                <td>2 mins ago</td>
+                                <td><span class="status active">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>@marcus_v</td>
+                                <td>Requested Artist Verification</td>
+                                <td>1 hour ago</td>
+                                <td><span class="status pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>@crypto_king</td>
+                                <td>Purchased Artwork #442</td>
+                                <td>3 hours ago</td>
+                                <td><span class="status active">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Other Tabs Placeholder -->
+            <div id="users" class="tab-content"><h2 style="margin-bottom: 2rem;">User Management</h2><p style="color: var(--text-muted);">Full list of users will appear here.</p></div>
+            <div id="artworks" class="tab-content"><h2 style="margin-bottom: 2rem;">Artwork Moderation</h2><p style="color: var(--text-muted);">Pending artworks for review.</p></div>
+            <div id="collections" class="tab-content"><h2 style="margin-bottom: 2rem;">Collections</h2><p style="color: var(--text-muted);">Platform collections management.</p></div>
+            <div id="transactions" class="tab-content"><h2 style="margin-bottom: 2rem;">Transactions</h2><p style="color: var(--text-muted);">Platform-wide financial ledger.</p></div>
+            <div id="reports" class="tab-content"><h2 style="margin-bottom: 2rem;">Reports & Analytics</h2><p style="color: var(--text-muted);">Generate financial and growth reports.</p></div>
+            <div id="disputes" class="tab-content"><h2 style="margin-bottom: 2rem;">Dispute Resolution</h2><p style="color: var(--text-muted);">Active tickets and user disputes.</p></div>
+            <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">System Settings</h2><p style="color: var(--text-muted);">Global configuration variables.</p></div>
+
+        </main>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>

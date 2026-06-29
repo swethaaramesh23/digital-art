@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        body { background-color: var(--bg-darker); }
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px; background: rgba(20,20,25,0.8); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
+            position: fixed; height: 100vh; z-index: 100;
+        }
+        .sidebar-header { padding: 2rem; border-bottom: 1px solid var(--glass-border); }
+        .sidebar-menu { flex: 1; padding: 2rem 1rem; overflow-y: auto; }
+        .sidebar-menu::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+            color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;
+            transition: var(--transition-fast);
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .sidebar-menu a.active { border-left: 3px solid var(--accent-1); }
+        .sidebar-footer { padding: 2rem; border-top: 1px solid var(--glass-border); }
+        .sidebar-profile { display: flex; align-items: center; gap: 1rem; }
+        .sidebar-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .main-content { flex: 1; margin-left: 280px; padding: 2rem 3rem; display: flex; flex-direction: column; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg); padding: 2rem; display: flex; justify-content: space-between; align-items: center;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
+        .purchased-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .purchased-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-md); overflow: hidden; transition: transform 0.3s; }
+        .purchased-card:hover { transform: translateY(-5px); }
+        .purchased-card img { width: 100%; height: 150px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+
+    <div class="dashboard-layout">
+        <!-- User Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 1rem 0 0.5rem 1.5rem; color: var(--text-muted);">Menu</p>
+                <a href="#dashboard" class="active"><i class="uil uil-apps"></i> Dashboard</a>
+                <a href="marketplace.html"><i class="uil uil-store"></i> Marketplace</a>
+                <a href="#purchased"><i class="uil uil-shopping-bag"></i> Purchased Artworks</a>
+                <a href="#collection"><i class="uil uil-layer-group"></i> My Collection</a>
+                <a href="#wishlist"><i class="uil uil-heart"></i> Wishlist</a>
+                <a href="#downloads"><i class="uil uil-cloud-download"></i> Downloads</a>
+                <a href="#orders"><i class="uil uil-receipt"></i> Orders</a>
+                
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 2rem 0 0.5rem 1.5rem; color: var(--text-muted);">Account</p>
+                <a href="#messages"><i class="uil uil-envelope"></i> Messages</a>
+                <a href="#notifications"><i class="uil uil-bell"></i> Notifications</a>
+                <a href="#profile"><i class="uil uil-user"></i> Profile</a>
+                <a href="#settings"><i class="uil uil-setting"></i> Settings</a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-profile">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="User">
+                    <div style="flex: 1;"><h5 style="margin: 0; font-size: 0.95rem;">Jane Doe</h5><p style="margin: 0; font-size: 0.8rem;">Collector</p></div>
+                    <a href="index.html" style="color: var(--accent-3);"><i class="uil uil-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header reveal">
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+                    <div><h2 style="margin: 0;">User Dashboard</h2><p style="margin: 0; font-size: 0.9rem;">Welcome back, Jane! Here's your collection overview.</p></div>
+                </div>
+                <div class="search-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.5rem; border-radius: var(--radius-full); display: flex; gap: 0.8rem; width: 300px;">
+                    <i class="uil uil-search" style="color: var(--text-muted);"></i>
+                    <input type="text" placeholder="Search..." style="background: transparent; border: none; color: white; outline: none; width: 100%;">
+                </div>
+            </header>
+
+            <div id="dashboard" class="tab-content active-tab">
+
+            <div class="grid-3 reveal stagger-1">
+                <div class="stat-card tilt-card">
+                    <div class="tilt-card-inner">
+                        <p style="margin-bottom: 0.5rem;">Total Value</p><h2 style="margin: 0;">12.5 ETH</h2>
+                    </div>
+                    <div class="stat-icon" style="background: rgba(109, 40, 217, 0.2); color: var(--accent-1);"><i class="uil uil-wallet"></i></div>
+                </div>
+                <div class="stat-card tilt-card">
+                    <div class="tilt-card-inner">
+                        <p style="margin-bottom: 0.5rem;">Artworks Owned</p><h2 style="margin: 0;">45</h2>
+                    </div>
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-image"></i></div>
+                </div>
+                <div class="stat-card tilt-card">
+                    <div class="tilt-card-inner">
+                        <p style="margin-bottom: 0.5rem;">Wishlist Items</p><h2 style="margin: 0;">12</h2>
+                    </div>
+                    <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-heart"></i></div>
+                </div>
+            </div>
+
+            <div class="reveal stagger-2" style="margin-top: 3rem;">
+                <div class="grid-3 reveal stagger-1">
+                    <div class="stat-card tilt-card">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.5rem;">Total Value</p><h2 style="margin: 0;">12.5 ETH</h2>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(109, 40, 217, 0.2); color: var(--accent-1);"><i class="uil uil-wallet"></i></div>
+                    </div>
+                    <div class="stat-card tilt-card">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.5rem;">Artworks Owned</p><h2 style="margin: 0;">45</h2>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-image"></i></div>
+                    </div>
+                    <div class="stat-card tilt-card">
+                        <div class="tilt-card-inner">
+                            <p style="margin-bottom: 0.5rem;">Wishlist Items</p><h2 style="margin: 0;">12</h2>
+                        </div>
+                        <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-heart"></i></div>
+                    </div>
+                </div>
+
+                <div class="reveal stagger-2" style="margin-top: 3rem;">
+                    <h3 style="margin-bottom: 1.5rem;">Purchased Artworks</h3>
+                    <div class="purchased-grid">
+                        <div class="purchased-card"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Art"><div style="padding: 1rem;"><h5 style="margin-bottom: 0.2rem;">Neon Genesis</h5><p style="margin: 0; font-size: 0.8rem;">0.8 ETH</p></div></div>
+                        <div class="purchased-card"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Art"><div style="padding: 1rem;"><h5 style="margin-bottom: 0.2rem;">Abstract Dimensions</h5><p style="margin: 0; font-size: 0.8rem;">1.2 ETH</p></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Other Tabs Placeholder -->
+            <div id="purchased" class="tab-content"><h2 style="margin-bottom: 2rem;">Purchased Artworks</h2><p style="color: var(--text-muted);">You have no purchased artworks yet. Start collecting!</p></div>
+            <div id="collection" class="tab-content"><h2 style="margin-bottom: 2rem;">My Collection</h2><p style="color: var(--text-muted);">Your custom curated collections will appear here.</p></div>
+            <div id="wishlist" class="tab-content"><h2 style="margin-bottom: 2rem;">Wishlist</h2><p style="color: var(--text-muted);">Items you save for later will appear here.</p></div>
+            <div id="downloads" class="tab-content"><h2 style="margin-bottom: 2rem;">Downloads</h2><p style="color: var(--text-muted);">Your downloadable high-res assets will appear here.</p></div>
+            <div id="orders" class="tab-content"><h2 style="margin-bottom: 2rem;">Orders</h2><p style="color: var(--text-muted);">Transaction history goes here.</p></div>
+            
+            <div id="messages" class="tab-content"><h2 style="margin-bottom: 2rem;">Messages</h2><p style="color: var(--text-muted);">No new messages.</p></div>
+            <div id="notifications" class="tab-content"><h2 style="margin-bottom: 2rem;">Notifications</h2><p style="color: var(--text-muted);">You're all caught up!</p></div>
+            <div id="profile" class="tab-content"><h2 style="margin-bottom: 2rem;">Profile</h2><p style="color: var(--text-muted);">Profile settings go here.</p></div>
+            <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">Settings</h2><p style="color: var(--text-muted);">Account preferences go here.</p></div>
+
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

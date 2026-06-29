@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections | Stackly</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .page-header { padding: 10rem 0 4rem; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        
+        .collection-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 1rem; transition: var(--transition-normal); overflow: hidden; }
+        .collection-images { display: grid; grid-template-columns: 2fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; height: 250px; border-radius: var(--radius-md); overflow: hidden; }
+        .collection-main-img { width: 100%; height: 100%; object-fit: cover; }
+        .collection-sub-images { display: grid; grid-template-rows: 1fr 1fr; gap: 0.5rem; }
+        .collection-sub-img { width: 100%; height: 100%; object-fit: cover; }
+        .collection-info { display: flex; justify-content: space-between; align-items: flex-end; }
+        .collection-creator { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; }
+        .collection-creator img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+        
+        .cat-scroll { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1.5rem; scrollbar-width: none; margin-bottom: 4rem; }
+        .cat-card-small { min-width: 200px; height: 120px; position: relative; border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .cat-card-small img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: var(--transition-fast); }
+        .cat-card-small:hover img { transform: scale(1.1); opacity: 0.8; }
+        .cat-card-small h4 { position: relative; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin: 0; }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+
+    <div class="aurora-bg"><div class="glow-3"></div></div>
+
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="collections.html" class="active">Collections</a></li>
+                <li><a href="artists.html">Artists</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline magnetic-btn">Login</a>
+                <a href="signup.html" class="btn btn-gradient-border magnetic-btn"><span>Sign Up</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-header container reveal">
+        <h1>Curated <span class="text-gradient">Collections</span></h1>
+        <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Explore the most exclusive and meticulously curated sets of digital masterpieces.</p>
+    </div>
+
+    <main class="container">
+        <!-- Collection Categories -->
+        <div class="cat-scroll reveal">
+            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Cyberpunk</h4></div></div>
+            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Abstract</h4></div></div>
+            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Fluid</h4></div></div>
+            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Geometric</h4></div></div>
+            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Urban</h4></div></div>
+            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Neon</h4></div></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;" class="reveal">
+            <h2>Trending <span class="text-gradient">Collections</span></h2>
+            <button class="btn btn-outline">View All</button>
+        </div>
+
+        <!-- Collections Grid -->
+        <div class="grid-2 reveal stagger-1" style="margin-bottom: 6rem;">
+            <!-- Collection 1 -->
+            <div class="collection-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="collection-images">
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
+                        <div class="collection-sub-images">
+                            <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
+                            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
+                        </div>
+                    </div>
+                    <div class="collection-info">
+                        <div>
+                            <div class="collection-creator">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Avatar">
+                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @neon_god</span>
+                            </div>
+                            <h3 style="margin: 0;">Cyberpunk Visions</h3>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
+                            <h4 style="margin: 0;">24</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collection 2 -->
+            <div class="collection-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="collection-images">
+                        <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
+                        <div class="collection-sub-images">
+                            <img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
+                            <img src="https://images.unsplash.com/photo-1633398813350-98fc1a7707c7?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
+                        </div>
+                    </div>
+                    <div class="collection-info">
+                        <div>
+                            <div class="collection-creator">
+                                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar">
+                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @synthwave</span>
+                            </div>
+                            <h3 style="margin: 0;">Neon Genesis Vol. 1</h3>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
+                            <h4 style="margin: 0;">12</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Collection 3 -->
+            <div class="collection-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="collection-images">
+                        <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
+                        <div class="collection-sub-images">
+                            <img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
+                            <img src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
+                        </div>
+                    </div>
+                    <div class="collection-info">
+                        <div>
+                            <div class="collection-creator">
+                                <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Avatar">
+                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @fluid_dynamics</span>
+                            </div>
+                            <h3 style="margin: 0;">Liquid State</h3>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
+                            <h4 style="margin: 0;">45</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collection 4 -->
+            <div class="collection-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="collection-images">
+                        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
+                        <div class="collection-sub-images">
+                            <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
+                        </div>
+                    </div>
+                    <div class="collection-info">
+                        <div>
+                            <div class="collection-creator">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Avatar">
+                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @creative_mind</span>
+                            </div>
+                            <h3 style="margin: 0;">Abstract Dimensions</h3>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
+                            <h4 style="margin: 0;">8</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="reveal" style="background: var(--gradient-primary); padding: 4rem; border-radius: var(--radius-lg); text-align: center;">
+            <h2 style="margin-bottom: 1rem;">Create Your Own Collection</h2>
+            <p style="color: white; max-width: 600px; margin: 0 auto 2rem;">Got an amazing set of artworks? Package them into a collection and launch them directly to our community.</p>
+            <a href="signup.html" class="btn magnetic-btn" style="background: white; color: var(--accent-1);">Start Creating</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
+                        <img src="lo.webp" alt="Stackly Logo">
+                    </a>
+                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
+                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">All Artworks</a></li>
+                        <li><a href="#">New Releases</a></li>
+                        <li><a href="#">Top Artists</a></li>
+                        <li><a href="#">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>My Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Profile</a></li>
+                        <li><a href="#">Favorites</a></li>
+                        <li><a href="#">My Collections</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stackly. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
