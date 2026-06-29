@@ -47,7 +47,25 @@
     </style>
 </head>
 <body>
-    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+        <div id="premium-loader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-noise"></div>
+        <div class="loader-mesh"></div>
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-ring"></div>
+                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+            </div>
+            <div class="loader-text-container">
+                <span id="loader-text"></span><span class="loader-cursor"></span>
+            </div>
+        </div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="loader-progress">
+                <div class="loader-shimmer"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="dashboard-layout">
         <!-- Admin Sidebar -->
@@ -78,10 +96,10 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <header class="dashboard-header reveal">
-                <div style="display: flex; align-items: center; gap: 2rem;">
-                    <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo" style="width: 40px;"></a>
-                    <div><h2 style="margin: 0;">Admin Control Panel</h2><p style="margin: 0; font-size: 0.9rem;">System status and platform management.</p></div>
+            <header class="dashboard-header reveal" style="position: relative;">
+                <div><h2 style="margin: 0;">Admin Control Panel</h2><p style="margin: 0; font-size: 0.9rem;">System status and platform management.</p></div>
+                <div style="position: absolute; left: 50%; transform: translateX(-50%);">
+                    <a href="index.html" class="logo"><img src="lo.webp" alt="Logo" style="height: 40px;"></a>
                 </div>
                 <div class="search-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.5rem; border-radius: var(--radius-full); display: flex; gap: 0.8rem; width: 300px;">
                     <i class="uil uil-search" style="color: var(--text-muted);"></i>
@@ -157,8 +175,60 @@
             <div id="disputes" class="tab-content"><h2 style="margin-bottom: 2rem;">Dispute Resolution</h2><p style="color: var(--text-muted);">Active tickets and user disputes.</p></div>
             <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">System Settings</h2><p style="color: var(--text-muted);">Global configuration variables.</p></div>
 
+            <!-- Footer -->
+    <footer style="margin-top: 4rem;">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
+                        <img src="lo.webp" alt="Stackly Logo">
+                    </a>
+                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
+                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>My Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Profile</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="404.html">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stackly. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
         </main>
     </div>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>

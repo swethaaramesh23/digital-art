@@ -7,13 +7,17 @@
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: var(--bg-dark);
+        }
+        .auth-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-top: 80px; /* Offset for fixed header */
+            min-height: calc(100vh - 80px);
+            padding: 4rem 1rem;
+            margin-top: 80px;
         }
         .auth-container { width: 100%; max-width: 450px; padding: 2rem; z-index: 10; margin-top: 2rem;}
         .auth-card {
@@ -55,7 +59,8 @@
         </div>
     </header>
 
-    <div class="auth-container reveal tilt-card">
+    <div class="auth-wrapper">
+        <div class="auth-container reveal tilt-card">
         <div class="auth-card tilt-card-inner">
             <div class="auth-logo">
                 <a href="index.html" class="logo">
@@ -86,7 +91,7 @@
                     <label class="checkbox-label">
                         <input type="checkbox" style="accent-color: var(--accent-1);"> Remember Me
                     </label>
-                    <a href="#" style="color: var(--text-muted); transition: var(--transition-fast);">Forgot Password?</a>
+                    <a href="404.html" style="color: var(--text-muted); transition: var(--transition-fast);">Forgot Password?</a>
                 </div>
                 <div class="magnetic-btn" style="width: 100%;">
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
@@ -97,8 +102,62 @@
                 Don't have an account? <a href="signup.html">Sign up</a>
             </div>
         </div>
+        </div>
     </div>
 
-    <script src="js/main.js"></script>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
+                        <img src="lo.webp" alt="Stackly Logo">
+                    </a>
+                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
+                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
+                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>My Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="login.html">Profile</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="404.html">Careers</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Stackly. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>

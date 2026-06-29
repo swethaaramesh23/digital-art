@@ -333,3 +333,196 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; 
   body { cursor: auto; }
   .btn, .form-input, .form-select, a { cursor: pointer; }
 }
+
+/* Premium Preloader Styles */
+body.preloading { overflow: hidden; }
+body.preloading > *:not(#premium-loader):not(script):not(style) { opacity: 0; transform: translateY(30px); }
+body.site-revealed > *:not(#premium-loader):not(script):not(style) {
+    animation: siteReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes siteReveal {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+#premium-loader {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #050816;
+    z-index: 999999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 0.8s ease-in-out;
+    overflow: hidden;
+}
+
+#premium-loader.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Background Effects */
+#loader-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.loader-noise { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; opacity: 0.05; background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E'); }
+.loader-mesh { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; z-index: 1; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(109, 40, 217, 0.15) 0%, transparent 40%), radial-gradient(circle at 30% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 40%); animation: slowMesh 20s ease-in-out infinite alternate; }
+
+@keyframes slowMesh {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.1) rotate(10deg); }
+}
+
+/* Content */
+.loader-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; }
+
+.loader-logo-container { position: relative; width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; margin-bottom: 2rem; }
+
+.loader-ring {
+    position: absolute; width: 140px; height: 140px; border-radius: 50%;
+    border: 2px solid transparent; border-top-color: var(--accent-1); border-bottom-color: var(--accent-2);
+    animation: spinRing 3s linear infinite;
+    filter: drop-shadow(0 0 10px var(--accent-1));
+}
+
+@keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.loader-logo-img {
+    height: 60px; width: auto; position: relative; z-index: 2;
+    animation: logoReveal 1s ease-out forwards, floatLogo 4s ease-in-out infinite alternate 1s;
+    filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+}
+
+#premium-loader.zoom-out .loader-logo-img {
+    animation: logoZoomOut 0.8s ease-in forwards;
+}
+
+@keyframes logoReveal { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes floatLogo { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-10px) scale(1); } }
+@keyframes logoZoomOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+
+.loader-text-container { font-family: var(--font-secondary); font-size: 1.1rem; color: #fff; font-weight: 300; letter-spacing: 1px; min-height: 24px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+.loader-cursor { display: inline-block; width: 2px; height: 18px; background: var(--accent-1); margin-left: 5px; vertical-align: middle; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Progress Bar */
+.loader-progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.05); z-index: 10; }
+.loader-progress-bar { width: 0%; height: 100%; background: var(--gradient-primary); position: relative; overflow: hidden; transition: width 0.1s linear; }
+.loader-shimmer { position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent); animation: shimmer 1.5s infinite; }
+
+@keyframes shimmer { 100% { left: 200%; } }
+/* =========================================
+   GLOBAL SPACING & LAYOUT OVERRIDES 
+   ========================================= */
+
+/* 1. Global Section Spacing */
+section {
+    padding: 100px 0 !important;
+    margin-bottom: 80px !important;
+}
+
+/* 2. Headings Space */
+.section-header, section h2, section h1 {
+    margin-bottom: 32px !important;
+}
+
+/* 3. Cards Spacing and Equal Height */
+.grid-2, .grid-3, .grid-4 {
+    gap: 48px !important; /* 40-60px spacing */
+    align-items: stretch !important;
+}
+
+.card {
+    padding: 24px !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure images in cards don't stretch unnaturally but fill width */
+.card > img {
+    width: 100% !important;
+    height: 240px !important; /* Fixed height for uniformity */
+    object-fit: cover !important;
+    border-radius: var(--radius-md) !important;
+    margin-bottom: 20px !important;
+}
+
+/* Make content inside card push bottom elements down */
+.card > div:not(.card-hover), .card > .card-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 4. Hero Sections */
+.hero {
+    min-height: 100vh !important;
+    padding: 120px 0 120px !important;
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 80px !important;
+}
+
+/* 5. Footer */
+footer {
+    margin-top: 100px !important;
+    padding: 100px 0 60px !important;
+}
+
+.footer-grid {
+    gap: 60px !important; /* Evenly spaced columns */
+}
+
+/* 6. Responsive Design Scaling */
+@media (max-width: 1024px) {
+    section {
+        padding: 80px 0 !important;
+        margin-bottom: 60px !important;
+    }
+    .hero {
+        padding: 100px 0 100px !important;
+        margin-bottom: 60px !important;
+    }
+    footer {
+        margin-top: 80px !important;
+        padding: 80px 0 40px !important;
+    }
+    .grid-2, .grid-3, .grid-4 {
+        gap: 32px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: 60px 0 !important;
+        margin-bottom: 40px !important;
+    }
+    .hero {
+        padding: 80px 0 80px !important;
+        margin-bottom: 40px !important;
+    }
+    footer {
+        margin-top: 60px !important;
+        padding: 60px 0 40px !important;
+    }
+    .section-header, section h2, section h1 {
+        margin-bottom: 24px !important;
+    }
+    .grid-2, .grid-3, .grid-4 {
+        gap: 24px !important;
+    }
+    .card {
+        padding: 16px !important;
+    }
+}
+
+.tilt-card-inner { padding: 24px !important; box-sizing: border-box !important; height: 100% !important; display: flex !important; flex-direction: column !important; } .tilt-card-inner > img { width: 100% !important; border-radius: var(--radius-md) !important; margin-bottom: 20px !important; }
+
+/* Featured Artists Horizontal Scroll */
+.carousel-container { width: 100%; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.carousel-container::-webkit-scrollbar { display: none; }
+.carousel-track { display: flex; gap: 30px; padding-bottom: 20px; flex-wrap: nowrap; align-items: stretch; }
+.carousel-track .card { flex: 0 0 auto !important; width: 280px !important; display: flex !important; flex-direction: column; }
+/* Reduce Global Section Spacing */
+section { padding: 60px 0 !important; margin-bottom: 40px !important; }
+.hero { padding: 100px 0 60px !important; margin-bottom: 40px !important; }
+@media (max-width: 768px) { section { padding: 40px 0 !important; margin-bottom: 20px !important; } .hero { padding: 80px 0 40px !important; margin-bottom: 20px !important; } }

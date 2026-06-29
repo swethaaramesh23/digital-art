@@ -31,15 +31,92 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Loading Screen
-    const loader = document.getElementById('loader');
-    if (loader) {
+    // 2. Premium Loading Screen
+    const pLoader = document.getElementById('premium-loader');
+    if (pLoader) {
+        document.body.classList.add('preloading');
+        const textEl = document.getElementById('loader-text');
+        const progressBar = document.getElementById('loader-progress');
+        const lCanvas = document.getElementById('loader-canvas');
+        
+        // Canvas Particles
+        if (lCanvas) {
+            const lCtx = lCanvas.getContext('2d');
+            let lParticles = [];
+            const resizeLCanvas = () => { lCanvas.width = window.innerWidth; lCanvas.height = window.innerHeight; };
+            window.addEventListener('resize', resizeLCanvas);
+            resizeLCanvas();
+            for(let i=0; i<40; i++) {
+                lParticles.push({
+                    x: Math.random() * lCanvas.width, y: Math.random() * lCanvas.height,
+                    s: Math.random() * 2 + 1, vx: (Math.random()-0.5)*1, vy: (Math.random()-0.5)*1,
+                    op: Math.random()*0.5 + 0.1
+                });
+            }
+            const drawL = () => {
+                lCtx.clearRect(0,0,lCanvas.width,lCanvas.height);
+                lParticles.forEach(p => {
+                    lCtx.fillStyle = `rgba(147, 197, 253, ${p.op})`;
+                    lCtx.beginPath(); lCtx.arc(p.x, p.y, p.s, 0, Math.PI*2); lCtx.fill();
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x<0||p.x>lCanvas.width) p.vx*=-1; if(p.y<0||p.y>lCanvas.height) p.vy*=-1;
+                });
+                if(!pLoader.classList.contains('hide')) requestAnimationFrame(drawL);
+            };
+            drawL();
+        }
+
+        // Text Typing
+        const phrases = ["Loading Creativity...", "Preparing Digital Collections...", "Connecting Artists & Collectors...", "Almost Ready..."];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        const typeDelay = 40;
+        const nextPhraseDelay = 500;
+        let isTyping = true;
+        
+        const typeText = () => {
+            if(!isTyping) return;
+            const current = phrases[phraseIndex];
+            if (!current) return;
+            textEl.textContent = current.substring(0, charIndex+1);
+            charIndex++;
+            if(charIndex < current.length) {
+                setTimeout(typeText, typeDelay);
+            } else {
+                phraseIndex++;
+                if(phraseIndex < phrases.length) {
+                    charIndex = 0;
+                    setTimeout(typeText, nextPhraseDelay);
+                }
+            }
+        };
+        setTimeout(typeText, 300);
+
+        // Progress Bar
+        let prog = 0;
+        const progInterval = setInterval(() => {
+            prog += Math.random() * 5 + 1;
+            if(prog >= 100) {
+                prog = 100;
+                clearInterval(progInterval);
+            }
+            if (progressBar) progressBar.style.width = prog + '%';
+        }, 80);
+
+        // Transition out after ~3.2s
         setTimeout(() => {
-            loader.style.opacity = '0';
+            isTyping = false;
+            clearInterval(progInterval);
+            if (progressBar) progressBar.style.width = '100%';
+            pLoader.classList.add('zoom-out');
+            
             setTimeout(() => {
-                loader.style.display = 'none';
-            }, 600);
-        }, 800);
+                pLoader.classList.add('hide');
+                document.body.classList.remove('preloading');
+                document.body.classList.add('site-revealed');
+                setTimeout(() => pLoader.remove(), 800);
+            }, 800);
+        }, 3200);
     }
 
     // 3. Sticky Glass Header
@@ -239,4 +316,135 @@ document.addEventListener('DOMContentLoaded', () => {
         
         counters.forEach(c => counterObserver.observe(c));
     }
+
+    // 13. Auto-changing Hero Artwork
+    const heroImg = document.getElementById('hero-artwork-img');
+    const heroTitle = document.getElementById('hero-artwork-title');
+    const heroAuthor = document.getElementById('hero-artwork-author');
+    const heroPrice = document.getElementById('hero-artwork-price');
+    
+    if (heroImg && heroTitle && heroAuthor && heroPrice) {
+        heroImg.style.transition = 'opacity 0.3s ease';
+        const artworks = [
+            { img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop", title: "Cyberpunk Odyssey", author: "by @neon_dreamer", price: "2.5 ETH" },
+            { img: "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=1000&auto=format&fit=crop", title: "Abstract Dimensions", author: "by @creative_mind", price: "1.2 ETH" },
+            { img: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1000&auto=format&fit=crop", title: "Neon Genesis", author: "by @synthwave", price: "0.8 ETH" }
+        ];
+        let currentArt = 0;
+        
+        setInterval(() => {
+            currentArt = (currentArt + 1) % artworks.length;
+            const art = artworks[currentArt];
+            
+            heroImg.style.opacity = '0';
+            setTimeout(() => {
+                heroImg.src = art.img;
+                heroTitle.innerText = art.title;
+                heroAuthor.innerText = art.author;
+                heroPrice.innerText = art.price;
+                heroImg.style.opacity = '1';
+            }, 300);
+        }, 5000);
+    }
+
+    // 14. Floating Particles
+    const canvas = document.getElementById('particles-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const resizeCanvas = () => {
+            const heroSection = document.querySelector('.hero');
+            if(heroSection) {
+                canvas.width = heroSection.clientWidth;
+                canvas.height = heroSection.clientHeight;
+            } else {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        };
+        resizeCanvas();
+        
+        const particles = [];
+        for (let i = 0; i < 60; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 1,
+                speedX: (Math.random() - 0.5) * 1.5,
+                speedY: (Math.random() - 0.5) * 1.5,
+                opacity: Math.random() * 0.5 + 0.1
+            });
+        }
+        
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                ctx.fillStyle = `rgba(147, 197, 253, ${p.opacity})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            });
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+        window.addEventListener('resize', resizeCanvas);
+    }
+
+    // 15. Marketplace: Quick View & Price Slider
+    const quickViewModal = document.getElementById('quickViewModal');
+    if (quickViewModal) {
+        const closeQuickView = document.getElementById('closeQuickView');
+        const qvImg = document.getElementById('qv-img');
+        const qvTitle = document.getElementById('qv-title');
+        const qvAuthor = document.getElementById('qv-author');
+        const qvPrice = document.getElementById('qv-price');
+
+        document.querySelectorAll('.quick-view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const cardInner = btn.closest('.tilt-card-inner');
+                if(cardInner) {
+                    const img = cardInner.querySelector('img').src;
+                    const title = cardInner.querySelector('h4').innerText;
+                    const author = cardInner.querySelector('p').innerText;
+                    const price = cardInner.querySelector('.text-gradient').innerText;
+                    
+                    qvImg.src = img;
+                    qvTitle.innerText = title;
+                    qvAuthor.innerText = author;
+                    qvPrice.innerText = price;
+                    quickViewModal.classList.add('active');
+                }
+            });
+        });
+
+        closeQuickView.addEventListener('click', () => {
+            quickViewModal.classList.remove('active');
+        });
+        
+        quickViewModal.addEventListener('click', (e) => {
+            if (e.target === quickViewModal) {
+                quickViewModal.classList.remove('active');
+            }
+        });
+
+        const priceSlider = document.getElementById('priceSlider');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        if (priceSlider && minPrice && maxPrice) {
+            priceSlider.addEventListener('input', (e) => {
+                maxPrice.value = e.target.value;
+                minPrice.value = "0";
+            });
+            maxPrice.addEventListener('input', (e) => {
+                priceSlider.value = e.target.value;
+            });
+        }
+    }
+
 });

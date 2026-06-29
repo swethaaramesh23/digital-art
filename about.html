@@ -42,7 +42,25 @@
     </style>
 </head>
 <body>
-    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+        <div id="premium-loader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-noise"></div>
+        <div class="loader-mesh"></div>
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-ring"></div>
+                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+            </div>
+            <div class="loader-text-container">
+                <span id="loader-text"></span><span class="loader-cursor"></span>
+            </div>
+        </div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="loader-progress">
+                <div class="loader-shimmer"></div>
+            </div>
+        </div>
+    </div>
     <div class="aurora-bg"><div class="glow-3"></div></div>
 
     <header>
@@ -97,6 +115,36 @@
                     <div style="font-size: 2rem; color: var(--accent-2); margin-bottom: 1rem;"><i class="uil uil-eye"></i></div>
                     <h3>Our Vision</h3>
                     <p>To become the global standard for digital art ownership, fostering a community where art transcends physical boundaries and borders.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Values Grid -->
+        <div class="reveal stagger-1" style="margin-bottom: 6rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2>Our Core <span class="text-gradient">Values</span></h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+                <div class="glass-panel tilt-card">
+                    <div class="tilt-card-inner" style="padding: 2rem; text-align: center;">
+                        <i class="uil uil-shield-check" style="font-size: 3rem; color: var(--accent-1); margin-bottom: 1rem;"></i>
+                        <h4 style="margin-bottom: 1rem;">Trust & Security</h4>
+                        <p style="font-size: 0.9rem;">We prioritize the safety of our creators and collectors above all else through audited smart contracts.</p>
+                    </div>
+                </div>
+                <div class="glass-panel tilt-card">
+                    <div class="tilt-card-inner" style="padding: 2rem; text-align: center;">
+                        <i class="uil uil-users-alt" style="font-size: 3rem; color: var(--accent-2); margin-bottom: 1rem;"></i>
+                        <h4 style="margin-bottom: 1rem;">Community First</h4>
+                        <p style="font-size: 0.9rem;">Stackly is built by and for the community. We actively listen and evolve based on your feedback.</p>
+                    </div>
+                </div>
+                <div class="glass-panel tilt-card">
+                    <div class="tilt-card-inner" style="padding: 2rem; text-align: center;">
+                        <i class="uil uil-lightbulb-alt" style="font-size: 3rem; color: var(--accent-3); margin-bottom: 1rem;"></i>
+                        <h4 style="margin-bottom: 1rem;">Innovation</h4>
+                        <p style="font-size: 0.9rem;">We continuously push the boundaries of what is possible in the digital art and Web3 space.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -199,6 +247,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- Press / Mentions -->
+        <div class="reveal" style="margin: 6rem 0; text-align: center; padding: 4rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--glass-border);">
+            <h3 style="margin-bottom: 3rem; color: var(--text-muted);">Featured In</h3>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 4rem; flex-wrap: wrap; opacity: 0.7;">
+                <h2 style="font-family: serif; font-style: italic; margin: 0;">The Digital Times</h2>
+                <h2 style="font-weight: 900; letter-spacing: -2px; margin: 0;">CRYPTO<span style="color: var(--accent-1)">ART</span></h2>
+                <h2 style="font-family: monospace; font-size: 2rem; margin: 0;">TechCrunch</h2>
+                <h2 style="text-transform: uppercase; letter-spacing: 5px; margin: 0;">Forbes</h2>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -219,41 +278,41 @@
                 <div class="footer-col">
                     <h4>Marketplace</h4>
                     <ul class="footer-links">
-                        <li><a href="#">All Artworks</a></li>
-                        <li><a href="#">New Releases</a></li>
-                        <li><a href="#">Top Artists</a></li>
-                        <li><a href="#">Collections</a></li>
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>My Account</h4>
                     <ul class="footer-links">
                         <li><a href="login.html">Profile</a></li>
-                        <li><a href="#">Favorites</a></li>
-                        <li><a href="#">My Collections</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
+                        <li><a href="404.html">Careers</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Stackly. All rights reserved.</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>

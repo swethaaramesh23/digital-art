@@ -27,7 +27,25 @@
     </style>
 </head>
 <body>
-    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+        <div id="premium-loader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-noise"></div>
+        <div class="loader-mesh"></div>
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-ring"></div>
+                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+            </div>
+            <div class="loader-text-container">
+                <span id="loader-text"></span><span class="loader-cursor"></span>
+            </div>
+        </div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="loader-progress">
+                <div class="loader-shimmer"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="aurora-bg"><div class="glow-3"></div></div>
 
@@ -55,7 +73,23 @@
     </div>
 
     <main class="container">
+        <!-- Featured Collection Banner -->
+        <div class="reveal tilt-card" style="margin-bottom: 4rem; position: relative; border-radius: var(--radius-lg); overflow: hidden; height: 400px;">
+            <div class="tilt-card-inner" style="height: 100%;">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop" style="width: 100%; height: 100%; object-fit: cover;" alt="Featured">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); display: flex; align-items: center; padding: 4rem;">
+                    <div style="max-width: 500px;">
+                        <span style="background: var(--gradient-primary); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 1rem; display: inline-block;">Collection of the Month</span>
+                        <h2 style="font-size: 3rem; margin-bottom: 1rem;">Neon Genesis Vol. II</h2>
+                        <p style="margin-bottom: 2rem; color: var(--text-muted);">The highly anticipated sequel to the legendary cyberpunk collection by @elena_creates.</p>
+                        <a href="marketplace.html" class="btn btn-primary magnetic-btn">Explore Collection</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Collection Categories -->
+        <h3 class="reveal" style="margin-bottom: 1.5rem;">Browse Categories</h3>
         <div class="cat-scroll reveal">
             <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Cyberpunk</h4></div></div>
             <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Abstract</h4></div></div>
@@ -177,6 +211,49 @@
             </div>
         </div>
 
+        <!-- Seasonal Collections & Stats -->
+        <div class="reveal" style="margin-bottom: 6rem; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 4rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2>Spring <span class="text-gradient">Showcase</span></h2>
+                <p>Exclusive seasonal drops curated by Stackly.</p>
+            </div>
+            
+            <div class="stats-grid" style="margin-bottom: 4rem;">
+                <div class="stat-item">
+                    <h3 class="counter text-gradient" data-target="1500">0</h3>
+                    <p>Total Collections</p>
+                </div>
+                <div class="stat-item">
+                    <h3 class="counter text-gradient" data-target="8500">0</h3>
+                    <p>Artworks Created</p>
+                </div>
+                <div class="stat-item">
+                    <h3 class="counter text-gradient" data-target="24000">0</h3>
+                    <p>Total Volume (ETH)</p>
+                </div>
+                <div class="stat-item">
+                    <h3 class="counter text-gradient" data-target="120">0</h3>
+                    <p>Curated Artists</p>
+                </div>
+            </div>
+
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <!-- Seasonal 1 -->
+                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Blossom</h4></div></div>
+                    <!-- Seasonal 2 -->
+                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Pastel Dreams</h4></div></div>
+                    <!-- Seasonal 3 -->
+                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Equinox</h4></div></div>
+                    <!-- Seasonal 4 -->
+                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Rebirth</h4></div></div>
+                    <!-- DUPLICATE -->
+                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Blossom</h4></div></div>
+                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Pastel Dreams</h4></div></div>
+                </div>
+            </div>
+        </div>
+
         <!-- CTA Section -->
         <div class="reveal" style="background: var(--gradient-primary); padding: 4rem; border-radius: var(--radius-lg); text-align: center;">
             <h2 style="margin-bottom: 1rem;">Create Your Own Collection</h2>
@@ -203,41 +280,41 @@
                 <div class="footer-col">
                     <h4>Marketplace</h4>
                     <ul class="footer-links">
-                        <li><a href="#">All Artworks</a></li>
-                        <li><a href="#">New Releases</a></li>
-                        <li><a href="#">Top Artists</a></li>
-                        <li><a href="#">Collections</a></li>
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>My Account</h4>
                     <ul class="footer-links">
                         <li><a href="login.html">Profile</a></li>
-                        <li><a href="#">Favorites</a></li>
-                        <li><a href="#">My Collections</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
+                        <li><a href="404.html">Careers</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Stackly. All rights reserved.</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>

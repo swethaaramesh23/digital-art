@@ -37,7 +37,25 @@
     </style>
 </head>
 <body>
-    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+        <div id="premium-loader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-noise"></div>
+        <div class="loader-mesh"></div>
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-ring"></div>
+                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+            </div>
+            <div class="loader-text-container">
+                <span id="loader-text"></span><span class="loader-cursor"></span>
+            </div>
+        </div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="loader-progress">
+                <div class="loader-shimmer"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="aurora-bg"><div class="glow-3"></div></div>
 
@@ -100,10 +118,15 @@
                     </div>
                     <div class="filter-section">
                         <h4>Price Range (ETH)</h4>
-                        <div class="price-inputs">
-                            <input type="number" placeholder="Min">
+                        <div class="price-inputs" style="margin-bottom: 1rem;">
+                            <input type="number" id="minPrice" placeholder="Min">
                             <span style="color: var(--text-muted);">to</span>
-                            <input type="number" placeholder="Max">
+                            <input type="number" id="maxPrice" placeholder="Max">
+                        </div>
+                        <input type="range" id="priceSlider" min="0" max="10" step="0.1" style="width: 100%; accent-color: var(--accent-1);">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            <span>0 ETH</span>
+                            <span>10 ETH</span>
                         </div>
                         <button class="btn btn-outline" style="width: 100%; margin-top: 1rem; padding: 0.5rem;">Apply</button>
                     </div>
@@ -120,13 +143,13 @@
                 </div>
             </aside>
 
-            <div class="art-grid">
+            <div class="masonry-grid" id="artGrid">
                 <!-- Card 1 -->
-                <div class="card tilt-card">
+                <div class="card tilt-card masonry-item">
                     <div class="tilt-card-inner">
                         <div class="card-img-wrapper">
                             <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
-                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Place Bid</button></div>
+                            <div class="card-overlay"><button class="btn btn-primary quick-view-btn" style="width: 100%;"><i class="uil uil-eye"></i> Quick View</button></div>
                         </div>
                         <div style="margin-top: 1rem;">
                             <h4 style="margin-bottom: 0.2rem;">Cyberpunk Genesis</h4>
@@ -140,11 +163,11 @@
                 </div>
                 
                 <!-- Card 2 -->
-                <div class="card tilt-card">
+                <div class="card tilt-card masonry-item">
                     <div class="tilt-card-inner">
                         <div class="card-img-wrapper">
                             <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
-                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                            <div class="card-overlay"><button class="btn btn-primary quick-view-btn" style="width: 100%;"><i class="uil uil-eye"></i> Quick View</button></div>
                         </div>
                         <div style="margin-top: 1rem;">
                             <h4 style="margin-bottom: 0.2rem;">Abstract Dimensions</h4>
@@ -158,11 +181,11 @@
                 </div>
 
                 <!-- Card 3 -->
-                <div class="card tilt-card">
+                <div class="card tilt-card masonry-item">
                     <div class="tilt-card-inner">
                         <div class="card-img-wrapper">
                             <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
-                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Place Bid</button></div>
+                            <div class="card-overlay"><button class="btn btn-primary quick-view-btn" style="width: 100%;"><i class="uil uil-eye"></i> Quick View</button></div>
                         </div>
                         <div style="margin-top: 1rem;">
                             <h4 style="margin-bottom: 0.2rem;">Digital Harmony</h4>
@@ -176,11 +199,11 @@
                 </div>
 
                 <!-- Card 4 -->
-                <div class="card tilt-card">
+                <div class="card tilt-card masonry-item">
                     <div class="tilt-card-inner">
                         <div class="card-img-wrapper">
                             <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
-                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                            <div class="card-overlay"><button class="btn btn-primary quick-view-btn" style="width: 100%;"><i class="uil uil-eye"></i> Quick View</button></div>
                         </div>
                         <div style="margin-top: 1rem;">
                             <h4 style="margin-bottom: 0.2rem;">Neon Genesis</h4>
@@ -194,11 +217,11 @@
                 </div>
 
                 <!-- Card 5 -->
-                <div class="card tilt-card">
+                <div class="card tilt-card masonry-item">
                     <div class="tilt-card-inner">
                         <div class="card-img-wrapper">
                             <img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
-                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Place Bid</button></div>
+                            <div class="card-overlay"><button class="btn btn-primary quick-view-btn" style="width: 100%;"><i class="uil uil-eye"></i> Quick View</button></div>
                         </div>
                         <div style="margin-top: 1rem;">
                             <h4 style="margin-bottom: 0.2rem;">Future Worlds</h4>
@@ -212,11 +235,11 @@
                 </div>
 
                 <!-- Card 6 -->
-                <div class="card tilt-card">
+                <div class="card tilt-card masonry-item">
                     <div class="tilt-card-inner">
                         <div class="card-img-wrapper">
                             <img src="https://images.unsplash.com/photo-1633398813350-98fc1a7707c7?q=80&w=600&auto=format&fit=crop" class="card-img" alt="Art">
-                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                            <div class="card-overlay"><button class="btn btn-primary quick-view-btn" style="width: 100%;"><i class="uil uil-eye"></i> Quick View</button></div>
                         </div>
                         <div style="margin-top: 1rem;">
                             <h4 style="margin-bottom: 0.2rem;">Golden Ratio</h4>
@@ -229,13 +252,16 @@
                     </div>
                 </div>
             </div>
+            <div style="text-align: center; margin-top: 3rem; width: 100%;">
+                <button class="btn btn-outline magnetic-btn" id="loadMoreBtn">Load More Artworks</button>
+            </div>
         </div>
 
         <!-- Recommended Artworks -->
         <div class="horizontal-section reveal">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
                 <h2>Recommended For You</h2>
-                <a href="#" class="btn btn-outline magnetic-btn">View All</a>
+                <a href="404.html" class="btn btn-outline magnetic-btn">View All</a>
             </div>
             <div class="horizontal-scroll">
                 <!-- Horizontal Cards -->
@@ -292,6 +318,42 @@
                     </div>
                 </div>
             </div>
+            </div>
+        </div>
+
+        <!-- Recently Viewed Artworks -->
+        <div class="horizontal-section reveal">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                <h2>Recently Viewed</h2>
+            </div>
+            <div class="horizontal-scroll">
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Liquid Flow</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @fluid_dynamics</p>
+                            <span class="text-gradient" style="font-weight: 700;">0.9 ETH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card tilt-card">
+                    <div class="tilt-card-inner">
+                        <div class="card-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=400&auto=format&fit=crop" class="card-img" alt="Art">
+                            <div class="card-overlay"><button class="btn btn-primary" style="width: 100%;">Buy Now</button></div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.2rem;">Prism Light</h4>
+                            <p style="font-size: 0.85rem; margin-bottom: 0.8rem;">by @color_master</p>
+                            <span class="text-gradient" style="font-weight: 700;">1.1 ETH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -313,41 +375,63 @@
                 <div class="footer-col">
                     <h4>Marketplace</h4>
                     <ul class="footer-links">
-                        <li><a href="#">All Artworks</a></li>
-                        <li><a href="#">New Releases</a></li>
-                        <li><a href="#">Top Artists</a></li>
-                        <li><a href="#">Collections</a></li>
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>My Account</h4>
                     <ul class="footer-links">
                         <li><a href="login.html">Profile</a></li>
-                        <li><a href="#">Favorites</a></li>
-                        <li><a href="#">My Collections</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
+                        <li><a href="404.html">Careers</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Stackly. All rights reserved.</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <!-- Quick View Modal -->
+    <div class="modal-overlay" id="quickViewModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeQuickView"><i class="uil uil-times"></i></button>
+            <div style="flex: 1;">
+                <img id="qv-img" src="" alt="Artwork" style="width: 100%; border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <h2 id="qv-title" style="margin-bottom: 0.5rem;">Artwork Title</h2>
+                <p id="qv-author" style="color: var(--text-muted); margin-bottom: 1.5rem;">by @author</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: var(--radius-md); margin-bottom: 2rem; border: 1px solid var(--glass-border);">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Current Price</p>
+                    <h3 id="qv-price" class="text-gradient" style="font-size: 2rem; margin: 0;">0 ETH</h3>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" style="flex: 1;">Buy Now</button>
+                    <button class="btn btn-outline" style="padding: 0 1.5rem;"><i class="uil uil-heart"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>

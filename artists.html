@@ -35,7 +35,25 @@
     </style>
 </head>
 <body>
-    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+        <div id="premium-loader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-noise"></div>
+        <div class="loader-mesh"></div>
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-ring"></div>
+                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+            </div>
+            <div class="loader-text-container">
+                <span id="loader-text"></span><span class="loader-cursor"></span>
+            </div>
+        </div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="loader-progress">
+                <div class="loader-shimmer"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="aurora-bg"><div class="glow-3"></div></div>
 
@@ -63,6 +81,13 @@
     </div>
 
     <main class="container">
+        <!-- Search Artists -->
+        <div class="search-bar reveal" style="max-width: 600px; margin: 0 auto 4rem; display: flex;">
+            <i class="uil uil-search" style="font-size: 1.2rem; color: var(--text-muted); margin-left: 0.5rem; align-self: center;"></i>
+            <input type="text" placeholder="Search for artists by name or username..." style="width: 100%;">
+            <button class="btn btn-primary" style="padding: 0.5rem 1.5rem; margin-left: auto;">Search</button>
+        </div>
+
         <!-- Spotlight -->
         <div class="artist-spotlight reveal tilt-card">
             <div class="tilt-card-inner" style="display: flex; gap: 4rem; width: 100%; align-items: center;">
@@ -113,64 +138,82 @@
             </select>
         </div>
 
-        <div class="grid-4 reveal stagger-2">
-            <!-- Artist 1 -->
-            <div class="artist-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
-                    <h4 style="margin-bottom: 0.2rem;">Jane Doe</h4>
-                    <p style="font-size: 0.85rem; color: var(--accent-1);">@janedoe</p>
-                    <div class="artist-stats">
-                        <div class="stat-box"><h4>45.2K</h4><p>Followers</p></div>
-                        <div class="stat-box"><h4>120 ETH</h4><p>Volume</p></div>
+        <div class="carousel-container reveal stagger-2">
+            <div class="carousel-track">
+                <!-- Artist 1 -->
+                <div class="artist-card tilt-card" style="width: 250px; display: inline-block; white-space: normal;">
+                    <div class="tilt-card-inner">
+                        <div class="artist-banner"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                        <h4 style="margin-bottom: 0.2rem;">Jane Doe</h4>
+                        <p style="font-size: 0.85rem; color: var(--accent-1);">@janedoe</p>
+                        <div class="artist-stats">
+                            <div class="stat-box"><h4>45.2K</h4><p>Followers</p></div>
+                            <div class="stat-box"><h4>120 ETH</h4><p>Volume</p></div>
+                        </div>
+                        <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                     </div>
-                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                 </div>
-            </div>
-            
-            <!-- Artist 2 -->
-            <div class="artist-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
-                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
-                    <h4 style="margin-bottom: 0.2rem;">Marcus Vance</h4>
-                    <p style="font-size: 0.85rem; color: var(--accent-1);">@marcus_v</p>
-                    <div class="artist-stats">
-                        <div class="stat-box"><h4>32.1K</h4><p>Followers</p></div>
-                        <div class="stat-box"><h4>98 ETH</h4><p>Volume</p></div>
+                
+                <!-- Artist 2 -->
+                <div class="artist-card tilt-card" style="width: 250px; display: inline-block; white-space: normal;">
+                    <div class="tilt-card-inner">
+                        <div class="artist-banner"><img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                        <h4 style="margin-bottom: 0.2rem;">Marcus Vance</h4>
+                        <p style="font-size: 0.85rem; color: var(--accent-1);">@marcus_v</p>
+                        <div class="artist-stats">
+                            <div class="stat-box"><h4>32.1K</h4><p>Followers</p></div>
+                            <div class="stat-box"><h4>98 ETH</h4><p>Volume</p></div>
+                        </div>
+                        <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                     </div>
-                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                 </div>
-            </div>
 
-            <!-- Artist 3 -->
-            <div class="artist-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
-                    <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
-                    <h4 style="margin-bottom: 0.2rem;">Sarah Chen</h4>
-                    <p style="font-size: 0.85rem; color: var(--accent-1);">@sarah_art</p>
-                    <div class="artist-stats">
-                        <div class="stat-box"><h4>28.5K</h4><p>Followers</p></div>
-                        <div class="stat-box"><h4>75 ETH</h4><p>Volume</p></div>
+                <!-- Artist 3 -->
+                <div class="artist-card tilt-card" style="width: 250px; display: inline-block; white-space: normal;">
+                    <div class="tilt-card-inner">
+                        <div class="artist-banner"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                        <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                        <h4 style="margin-bottom: 0.2rem;">Sarah Chen</h4>
+                        <p style="font-size: 0.85rem; color: var(--accent-1);">@sarah_art</p>
+                        <div class="artist-stats">
+                            <div class="stat-box"><h4>28.5K</h4><p>Followers</p></div>
+                            <div class="stat-box"><h4>75 ETH</h4><p>Volume</p></div>
+                        </div>
+                        <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                     </div>
-                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                 </div>
-            </div>
 
-            <!-- Artist 4 -->
-            <div class="artist-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="artist-banner"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
-                    <h4 style="margin-bottom: 0.2rem;">David Kim</h4>
-                    <p style="font-size: 0.85rem; color: var(--accent-1);">@dk_designs</p>
-                    <div class="artist-stats">
-                        <div class="stat-box"><h4>22.3K</h4><p>Followers</p></div>
-                        <div class="stat-box"><h4>45 ETH</h4><p>Volume</p></div>
+                <!-- Artist 4 -->
+                <div class="artist-card tilt-card" style="width: 250px; display: inline-block; white-space: normal;">
+                    <div class="tilt-card-inner">
+                        <div class="artist-banner"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                        <h4 style="margin-bottom: 0.2rem;">David Kim</h4>
+                        <p style="font-size: 0.85rem; color: var(--accent-1);">@dk_designs</p>
+                        <div class="artist-stats">
+                            <div class="stat-box"><h4>22.3K</h4><p>Followers</p></div>
+                            <div class="stat-box"><h4>45 ETH</h4><p>Volume</p></div>
+                        </div>
+                        <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
                     </div>
-                    <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
+                </div>
+
+                <!-- DUPLICATE FOR SCROLL -->
+                <!-- Artist 1 -->
+                <div class="artist-card tilt-card" style="width: 250px; display: inline-block; white-space: normal;">
+                    <div class="tilt-card-inner">
+                        <div class="artist-banner"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Banner"></div>
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Avatar" class="artist-avatar">
+                        <h4 style="margin-bottom: 0.2rem;">Jane Doe</h4>
+                        <p style="font-size: 0.85rem; color: var(--accent-1);">@janedoe</p>
+                        <div class="artist-stats">
+                            <div class="stat-box"><h4>45.2K</h4><p>Followers</p></div>
+                            <div class="stat-box"><h4>120 ETH</h4><p>Volume</p></div>
+                        </div>
+                        <button class="btn btn-outline magnetic-btn" style="width: 80%;">Follow</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -201,41 +244,41 @@
                 <div class="footer-col">
                     <h4>Marketplace</h4>
                     <ul class="footer-links">
-                        <li><a href="#">All Artworks</a></li>
-                        <li><a href="#">New Releases</a></li>
-                        <li><a href="#">Top Artists</a></li>
-                        <li><a href="#">Collections</a></li>
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>My Account</h4>
                     <ul class="footer-links">
                         <li><a href="login.html">Profile</a></li>
-                        <li><a href="#">Favorites</a></li>
-                        <li><a href="#">My Collections</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
+                        <li><a href="404.html">Careers</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Stackly. All rights reserved.</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>

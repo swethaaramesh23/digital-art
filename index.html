@@ -29,7 +29,25 @@
     </style>
 </head>
 <body>
-    <div id="loader"><div class="loader-logo"><img src="lo.webp" alt="Stackly"></div><div class="loader-bar"></div></div>
+        <div id="premium-loader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-noise"></div>
+        <div class="loader-mesh"></div>
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-ring"></div>
+                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+            </div>
+            <div class="loader-text-container">
+                <span id="loader-text"></span><span class="loader-cursor"></span>
+            </div>
+        </div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="loader-progress">
+                <div class="loader-shimmer"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="aurora-bg"><div class="glow-3"></div></div>
 
@@ -52,8 +70,9 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="container" style="display: flex; align-items: center;">
+    <section class="hero" style="position: relative; overflow: hidden;">
+        <canvas id="particles-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;"></canvas>
+        <div class="container" style="display: flex; align-items: center; position: relative; z-index: 2;">
             <div class="hero-content reveal">
                 <h1>Discover <br><span class="text-gradient">Rare Digital Art</span> <br>and Collectibles</h1>
                 <p>The world's first and largest premium digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
@@ -84,15 +103,15 @@
 
                 <div class="hero-artwork-card glass-panel tilt-card" style="position: relative; z-index: 2;">
                     <div class="tilt-card-inner">
-                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" alt="Featured Hero Art">
+                        <img id="hero-artwork-img" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" alt="Featured Hero Art">
                         <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <h4 style="margin: 0; font-size: 1.1rem;">Cyberpunk Odyssey</h4>
-                                <p style="margin: 0; font-size: 0.9rem;">by @neon_dreamer</p>
+                                <h4 id="hero-artwork-title" style="margin: 0; font-size: 1.1rem;">Cyberpunk Odyssey</h4>
+                                <p id="hero-artwork-author" style="margin: 0; font-size: 0.9rem;">by @neon_dreamer</p>
                             </div>
                             <div style="text-align: right;">
                                 <p style="margin: 0; font-size: 0.8rem; color: var(--accent-1);">Current Bid</p>
-                                <h4 style="margin: 0;">2.5 ETH</h4>
+                                <h4 id="hero-artwork-price" style="margin: 0;">2.5 ETH</h4>
                             </div>
                         </div>
                     </div>
@@ -199,6 +218,73 @@
         </div>
     </section>
 
+    <!-- Auto-scrolling Featured Artists Carousel -->
+    <section class="container reveal">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2>Featured <span class="text-gradient">Artists</span></h2>
+        </div>
+        <div class="carousel-container">
+            <div class="carousel-track">
+                <!-- Artist 1 -->
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--accent-1);" alt="Artist">
+                        <h4 style="margin: 0;">@neon_dreamer</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">4.5M Volume</p>
+                    </div>
+                </div>
+                <!-- Artist 2 -->
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--accent-2);" alt="Artist">
+                        <h4 style="margin: 0;">@creative_mind</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">2.1M Volume</p>
+                    </div>
+                </div>
+                <!-- Artist 3 -->
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--accent-3);" alt="Artist">
+                        <h4 style="margin: 0;">@synthwave</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">1.8M Volume</p>
+                    </div>
+                </div>
+                <!-- Artist 4 -->
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--glass-border);" alt="Artist">
+                        <h4 style="margin: 0;">@art_bot</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">800K Volume</p>
+                    </div>
+                </div>
+                <!-- Artist 5 -->
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--glass-border);" alt="Artist">
+                        <h4 style="margin: 0;">@visionary</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">1.2M Volume</p>
+                    </div>
+                </div>
+                
+                <!-- DUPLICATE FOR SEAMLESS SCROLL -->
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--accent-1);" alt="Artist">
+                        <h4 style="margin: 0;">@neon_dreamer</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">4.5M Volume</p>
+                    </div>
+                </div>
+                <div class="card tilt-card" style="width: 250px; text-align: center; display: inline-block;">
+                    <div class="tilt-card-inner" style="padding: 2rem;">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1rem; border: 2px solid var(--accent-2);" alt="Artist">
+                        <h4 style="margin: 0;">@creative_mind</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0;">2.1M Volume</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Platform Features -->
     <section class="container reveal">
         <div style="text-align: center; margin-bottom: 4rem;">
@@ -209,9 +295,46 @@
             <div class="card tilt-card" style="text-align: center; padding: 3rem 2rem;">
                 <div class="tilt-card-inner">
                     <div style="width: 60px; height: 60px; background: rgba(109, 40, 217, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--accent-1); font-size: 1.5rem;">
+                        <i class="uil uil-shield-check"></i>
+                    </div>
+                    <h3>Secure Transactions</h3>
+                    <p>All smart contracts are heavily audited to ensure maximum security for your digital assets.</p>
+                </div>
+            </div>
+            <div class="card tilt-card" style="text-align: center; padding: 3rem 2rem;">
+                <div class="tilt-card-inner">
+                    <div style="width: 60px; height: 60px; background: rgba(59, 130, 246, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--accent-2); font-size: 1.5rem;">
+                        <i class="uil uil-bolt-alt"></i>
+                    </div>
+                    <h3>Lightning Fast</h3>
+                    <p>Experience zero-latency browsing and instant transaction confirmations on our Layer-2 scaling solution.</p>
+                </div>
+            </div>
+            <div class="card tilt-card" style="text-align: center; padding: 3rem 2rem;">
+                <div class="tilt-card-inner">
+                    <div style="width: 60px; height: 60px; background: rgba(236, 72, 153, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--accent-3); font-size: 1.5rem;">
+                        <i class="uil uil-users-alt"></i>
+                    </div>
+                    <h3>Vibrant Community</h3>
+                    <p>Join thousands of active creators and collectors engaging daily on our premium platform.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="container reveal">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h2>How It <span class="text-gradient">Works</span></h2>
+            <p>Start your NFT journey in three simple steps.</p>
+        </div>
+        <div class="grid-3 reveal stagger-2">
+            <div class="card tilt-card" style="text-align: center; padding: 3rem 2rem;">
+                <div class="tilt-card-inner">
+                    <div style="width: 60px; height: 60px; background: rgba(109, 40, 217, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--accent-1); font-size: 1.5rem;">
                         <i class="uil uil-wallet"></i>
                     </div>
-                    <h3>Set up your wallet</h3>
+                    <h3>1. Set up your wallet</h3>
                     <p>Once you've set up your wallet of choice, connect it to Stackly by clicking the wallet icon in the top right corner.</p>
                 </div>
             </div>
@@ -220,7 +343,7 @@
                     <div style="width: 60px; height: 60px; background: rgba(59, 130, 246, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--accent-2); font-size: 1.5rem;">
                         <i class="uil uil-apps"></i>
                     </div>
-                    <h3>Create your collection</h3>
+                    <h3>2. Create your collection</h3>
                     <p>Click My Collections and set up your collection. Add social links, a description, profile & banner images, and set a secondary sales fee.</p>
                 </div>
             </div>
@@ -229,7 +352,7 @@
                     <div style="width: 60px; height: 60px; background: rgba(236, 72, 153, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--accent-3); font-size: 1.5rem;">
                         <i class="uil uil-tag-alt"></i>
                     </div>
-                    <h3>List them for sale</h3>
+                    <h3>3. List them for sale</h3>
                     <p>Choose between auctions, fixed-price listings, and declining-price listings. You choose how you want to sell your art.</p>
                 </div>
             </div>
@@ -294,6 +417,28 @@
         </div>
     </section>
 
+    <!-- FAQ Section -->
+    <section class="container reveal">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h2>Frequently Asked <span class="text-gradient">Questions</span></h2>
+            <p>Everything you need to know about Stackly.</p>
+        </div>
+        <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h4 style="margin: 0 0 0.5rem 0;">What is an NFT?</h4>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">An NFT (Non-Fungible Token) is a unique digital asset verified using blockchain technology, ensuring authenticity and ownership.</p>
+            </div>
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h4 style="margin: 0 0 0.5rem 0;">How do I buy art on Stackly?</h4>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Connect your digital wallet (like MetaMask), fund it with Ethereum, browse our marketplace, and click "Buy Now" or place a bid on an artwork.</p>
+            </div>
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h4 style="margin: 0 0 0.5rem 0;">Are there any fees?</h4>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Stackly charges a standard 2.5% transaction fee on all secondary sales. Minting fees depend on current Ethereum gas prices.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Newsletter -->
     <section class="container reveal">
         <div style="background: var(--gradient-primary); padding: 4rem; border-radius: var(--radius-lg); text-align: center; position: relative; overflow: hidden;">
@@ -326,41 +471,41 @@
                 <div class="footer-col">
                     <h4>Marketplace</h4>
                     <ul class="footer-links">
-                        <li><a href="#">All Artworks</a></li>
-                        <li><a href="#">New Releases</a></li>
-                        <li><a href="#">Top Artists</a></li>
-                        <li><a href="#">Collections</a></li>
+                        <li><a href="404.html">All Artworks</a></li>
+                        <li><a href="404.html">New Releases</a></li>
+                        <li><a href="404.html">Top Artists</a></li>
+                        <li><a href="404.html">Collections</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>My Account</h4>
                     <ul class="footer-links">
                         <li><a href="login.html">Profile</a></li>
-                        <li><a href="#">Favorites</a></li>
-                        <li><a href="#">My Collections</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="404.html">Favorites</a></li>
+                        <li><a href="404.html">My Collections</a></li>
+                        <li><a href="404.html">Settings</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
+                        <li><a href="404.html">Careers</a></li>
                         <li><a href="contact.html">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="404.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Stackly. All rights reserved.</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Privacy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=2"></script>
 </body>
 </html>
