@@ -7,228 +7,547 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        body { background-color: var(--bg-darker); }
-        .dashboard-layout { display: flex; min-height: 100vh; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; background-color: var(--bg-darker, #050508); color: var(--text-main, #F8FAFC); font-family: var(--font-primary, 'Outfit', sans-serif); }
+        .dashboard-layout { display: block; width: 100%; min-height: 100vh; }
+
+        /* ── Mobile header (hidden on desktop) ── */
+        .mobile-header { display: none; padding: 1rem 1.5rem; background: rgba(12,12,18,0.97); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border,rgba(255,255,255,0.06)); position: fixed; top: 0; left: 0; right: 0; z-index: 1060; justify-content: space-between; align-items: center; }
+        .hamburger-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+
+        /* ── Overlay (mobile only) ── */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(5,5,8,0.85); z-index: 1045; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { opacity: 1; }
+
+        /* ── Sidebar ── */
         .sidebar {
-            width: 280px; background: rgba(20,20,25,0.8); backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
-            position: fixed; height: 100vh; z-index: 100;
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-width, 280px);
+            background: rgba(12,12,18,0.98); backdrop-filter: blur(24px);
+            border-right: 1px solid var(--glass-border, rgba(255,255,255,0.06));
+            display: flex; flex-direction: column;
+            z-index: 1050;
+            transition: width 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.3s cubic-bezier(0.16,1,0.3,1);
+            overflow: hidden;
         }
-        .sidebar-header { padding: 2rem; border-bottom: 1px solid var(--glass-border); }
-        .sidebar-menu { flex: 1; padding: 2rem 1rem; overflow-y: auto; }
-        .sidebar-menu::-webkit-scrollbar { width: 4px; }
-        .sidebar-menu a {
-            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
-            color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;
-            transition: var(--transition-fast);
+        /* Desktop collapsed state */
+        .sidebar.collapsed { width: var(--sidebar-mini-width, 80px); }
+        .sidebar.collapsed .sidebar-logo span,
+        .sidebar.collapsed .sidebar-user-card > div,
+        .sidebar.collapsed .sidebar-section-title,
+        .sidebar.collapsed .alert-dot,
+        .sidebar.collapsed .notif-dot { display: none !important; }
+        .sidebar.collapsed .sidebar-menu a { justify-content: center; padding: 0.85rem 0; gap: 0; }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 1.25rem 0.5rem; }
+        .sidebar.collapsed .sidebar-user-card { padding: 0.5rem; justify-content: center; background: transparent; border-color: transparent; }
+        .sidebar.collapsed .toggle-desktop-sidebar { margin: 0 auto; }
+
+        .sidebar-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border,rgba(255,255,255,0.06)); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-shrink: 0; min-height: 66px; }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; overflow: hidden; }
+        .sidebar-logo img { height: 28px; flex-shrink: 0; }
+        .sidebar-logo span { font-weight: 700; font-size: 1.05rem; color: #fff; white-space: nowrap; }
+        .close-sidebar { display: none; background: none; border: none; color: var(--text-muted,#64748B); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+        .toggle-desktop-sidebar { background: none; border: none; color: var(--text-muted,#64748B); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; transition: color 0.2s; flex-shrink: 0; }
+        .toggle-desktop-sidebar:hover { color: #fff; }
+
+        .sidebar-user-card { margin: 0.85rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(0,229,255,0.07); border: 1px solid rgba(0,229,255,0.18); display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; transition: all 0.3s; overflow: hidden; }
+        .sidebar-user-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,229,255,0.3); flex-shrink: 0; }
+        .sidebar-user-card h6 { margin: 0; font-size: 0.88rem; color: #fff; white-space: nowrap; }
+        .sidebar-user-card p { margin: 0; font-size: 0.73rem; color: var(--text-muted,#64748B); white-space: nowrap; }
+
+        .sidebar-menu { flex: 1; padding: 0.5rem 0.75rem 1rem; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-menu::-webkit-scrollbar { width: 3px; }
+        .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+        .sidebar-section-title { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted,#64748B); font-weight: 700; padding: 1rem 0.85rem 0.4rem; margin: 0; white-space: nowrap; overflow: hidden; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 0.85rem; padding: 0.72rem 0.9rem; color: var(--text-muted,#64748B); border-radius: 10px; margin-bottom: 0.1rem; font-weight: 500; font-size: 0.88rem; transition: all 0.2s; text-decoration: none; white-space: nowrap; overflow: hidden; }
+        .sidebar-menu a i { font-size: 1.15rem; width: 22px; text-align: center; flex-shrink: 0; transition: transform 0.2s, color 0.2s; }
+        .sidebar-menu a span { overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .sidebar-menu a:hover i { transform: scale(1.15) rotate(-8deg); }
+        .sidebar-menu a.active { background: rgba(0,229,255,0.1); color: #fff; border-left: 3px solid var(--accent-cyan,#00E5FF); padding-left: calc(0.9rem - 3px); box-shadow: inset 0 0 20px rgba(0,229,255,0.06); }
+        .sidebar-menu a.active i { color: var(--accent-cyan,#00E5FF); }
+        .sidebar-menu a.logout-link { color: #ef4444; }
+        .sidebar-menu a.logout-link:hover { background: rgba(239,68,68,0.1); }
+        .alert-dot, .notif-dot { margin-left: auto; background: #ef4444; color: #fff; border-radius: 20px; padding: 1px 7px; font-size: 0.67rem; font-weight: 700; flex-shrink: 0; }
+
+        /* ── Main Content ── */
+        .main-content {
+            margin-left: var(--sidebar-width, 280px);
+            width: calc(100% - var(--sidebar-width, 280px));
+            min-height: 100vh; padding: 2rem 2.5rem;
+            box-sizing: border-box;
+            transition: margin-left 0.3s cubic-bezier(0.16,1,0.3,1), width 0.3s cubic-bezier(0.16,1,0.3,1);
         }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.05); color: var(--text-main); }
-        .sidebar-menu a.active { border-left: 3px solid var(--accent-1); }
-        .sidebar-footer { padding: 2rem; border-top: 1px solid var(--glass-border); }
-        .sidebar-profile { display: flex; align-items: center; gap: 1rem; }
-        .sidebar-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .main-content { flex: 1; margin-left: 280px; padding: 2rem 3rem; display: flex; flex-direction: column; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
-        .stat-card {
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg); padding: 2rem; display: flex; justify-content: space-between; align-items: center;
+        body.sidebar-collapsed .main-content {
+            margin-left: var(--sidebar-mini-width, 80px);
+            width: calc(100% - var(--sidebar-mini-width, 80px));
         }
-        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
-        
-        /* Table Styles */
-        .table-container { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2rem; overflow-x: auto; margin-top: 2rem;}
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        th { font-family: var(--font-secondary); color: var(--text-muted); font-weight: 500; font-size: 0.9rem; }
+
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .dashboard-header h2 { margin: 0; font-size: 1.65rem; background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .dashboard-header p { margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--text-muted,#64748B); }
+
+        /* ── Tabs ── */
+        .tab-content { display: none; }
+        .tab-content.active-tab { display: block; animation: dashSlideUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes dashSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Grids ── */
+        .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
+
+        /* ── Stat Cards ── */
+        .stat-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .stat-card h2 { margin: 0; font-size: 2rem; }
+        .stat-card p { margin: 0 0 0.2rem; font-size: 0.84rem; color: var(--text-muted,#64748B); }
+        .stat-card .trend { font-size: 0.77rem; color: #10b981; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.25rem; }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; flex-shrink: 0; }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .section-header h3 { margin: 0; font-size: 1.1rem; }
+        .section-header a, .section-header button { color: var(--accent-amber,#F59E0B); font-size: 0.84rem; font-weight: 500; text-decoration: none; background: none; border: none; cursor: pointer; }
+
+        /* ── Table ── */
+        .table-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 1.5rem; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 580px; }
+        th, td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.87rem; }
+        th { color: var(--text-muted,#64748B); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; background: rgba(255,255,255,0.02); }
         tr:hover td { background: rgba(255,255,255,0.02); }
-        .status { padding: 0.3rem 0.8rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; }
-        .status.active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .status.pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        td:last-child { text-align: right; }
+
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.71rem; font-weight: 700; }
+        .badge-success { background: rgba(16,185,129,0.15); color: #10b981; }
+        .badge-pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .badge-processing { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .badge-reject { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .btn-sm { padding: 0.4rem 0.85rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary-sm { background: linear-gradient(135deg,#f59e0b,#ef4444); color: #fff; }
+        .btn-outline-sm { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); }
+        .btn-success-sm { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+        .btn-danger-sm  { background: rgba(239,68,68,0.1);  color: #ef4444;  border: 1px solid rgba(239,68,68,0.25); }
+
+        .action-btn { background: none; border: none; color: var(--text-muted,#64748B); cursor: pointer; padding: 0.4rem; font-size: 1rem; transition: all 0.2s; border-radius: 6px; }
+        .action-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .action-btn.approve:hover { color: #10b981; }
+        .action-btn.reject:hover  { color: #ef4444; }
+        .action-btn.view:hover    { color: var(--accent-amber,#F59E0B); }
+
+        /* ── Chart ── */
+        .chart-wrap { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 1.5rem; }
+        .chart-bars { display: flex; align-items: flex-end; gap: 0.5rem; height: 160px; padding-top: 1rem; }
+        .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+        .bar { width: 100%; border-radius: 6px 6px 0 0; background: linear-gradient(180deg,#f59e0b,#ef4444); transition: height 1.2s cubic-bezier(0.4,0,0.2,1); min-height: 4px; }
+        .bar-label { font-size: 0.68rem; color: var(--text-muted,#64748B); }
+
+        /* ── Alert item ── */
+        .alert-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .alert-item:last-child { border-bottom: none; }
+        .alert-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+
+        /* ── Forms / Settings ── */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.4rem; color: var(--text-muted,#64748B); font-size: 0.84rem; font-weight: 500; }
+        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); background: rgba(255,255,255,0.03); color: #fff; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; box-sizing: border-box; }
+        .form-input:focus { outline: none; border-color: var(--accent-amber,#F59E0B); }
+        .settings-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+        .settings-card h4 { margin: 0 0 1.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .settings-card h4 i { color: var(--accent-amber,#F59E0B); }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-row h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .toggle-row p { margin: 0; font-size: 0.8rem; color: var(--text-muted,#64748B); }
+        .toggle { position: relative; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 30px; cursor: pointer; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider { background: var(--accent-amber,#F59E0B); }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; left: 3px; top: 3px; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* ── Pagination / Table controls ── */
+        .table-controls { margin-bottom: 1rem; }
+        .table-search { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 8px; color: #fff; padding: 0.5rem 0.85rem; font-size: 0.85rem; width: 240px; max-width: 100%; }
+        .table-search:focus { outline: none; border-color: var(--accent-cyan,#00E5FF); }
+        .pagination { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
+        .pagination-info { font-size: 0.78rem; color: var(--text-muted,#64748B); margin-right: auto; }
+        .page-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); color: #fff; border-radius: 6px; padding: 0.3rem 0.65rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .page-btn:hover:not(:disabled) { background: rgba(0,229,255,0.1); border-color: var(--accent-cyan,#00E5FF); }
+        .page-btn.active { background: rgba(0,229,255,0.15); border-color: var(--accent-cyan,#00E5FF); color: var(--accent-cyan,#00E5FF); }
+        .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .sortable { cursor: pointer; }
+        .sort-asc::after  { content: ' ↑'; opacity: 0.6; }
+        .sort-desc::after { content: ' ↓'; opacity: 0.6; }
+
+        footer { margin-top: 3rem; }
+        footer div { border-top: 1px solid var(--glass-border,rgba(255,255,255,0.06)); padding: 1.5rem 0; text-align: center; color: var(--text-muted,#64748B); font-size: 0.82rem; }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 1024px) {
+            /* Show mobile top bar */
+            .mobile-header { display: flex !important; }
+            /* Sidebar slides in from left */
+            .sidebar { transform: translateX(-100%); width: 280px !important; }
+            .sidebar.open { transform: translateX(0); }
+            /* Overlay visible on mobile */
+            .sidebar-overlay { display: block; }
+            /* Desktop toggle hidden on mobile */
+            .toggle-desktop-sidebar { display: none; }
+            /* Close X button visible */
+            .close-sidebar { display: block !important; }
+            /* Reset collapsed state overrides on mobile */
+            .sidebar.collapsed { width: 280px !important; }
+            .sidebar.collapsed .sidebar-logo span,
+            .sidebar.collapsed .sidebar-user-card > div,
+            .sidebar.collapsed .sidebar-section-title,
+            .sidebar.collapsed .alert-dot,
+            .sidebar.collapsed .notif-dot { display: block !important; }
+            .sidebar.collapsed .sidebar-menu a { justify-content: flex-start !important; padding: 0.72rem 0.9rem !important; gap: 0.85rem !important; }
+            .sidebar.collapsed .sidebar-header { justify-content: space-between !important; padding: 1.25rem 1.5rem !important; }
+            .sidebar.collapsed .sidebar-user-card { padding: 0.9rem 1rem !important; justify-content: flex-start !important; background: rgba(0,229,255,0.07) !important; border-color: rgba(0,229,255,0.18) !important; }
+            /* Main content full width */
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 5.5rem 1.25rem 2rem !important; transition: none; }
+            body.sidebar-collapsed .main-content { margin-left: 0 !important; width: 100% !important; }
+            .grid-3 { grid-template-columns: repeat(2,1fr); }
+        }
+        @media (max-width: 640px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+            .main-content { padding: 5rem 1rem 2rem !important; }
+        }
     </style>
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
-        <div id="premium-loader">
-        <canvas id="loader-canvas"></canvas>
-        <div class="loader-noise"></div>
-        <div class="loader-mesh"></div>
-        <div class="loader-content">
-            <div class="loader-logo-container">
-                <div class="loader-ring"></div>
-                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
-            </div>
-            <div class="loader-text-container">
-                <span id="loader-text"></span><span class="loader-cursor"></span>
-            </div>
-        </div>
-        <div class="loader-progress-container">
-            <div class="loader-progress-bar" id="loader-progress">
-                <div class="loader-shimmer"></div>
-            </div>
-        </div>
+    <div class="mobile-header">
+        <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+        <button class="hamburger" id="open-sidebar" aria-label="Menu" style="display:flex; z-index:1001;"><span></span><span></span><span></span></button>
     </div>
 
     <div class="dashboard-layout">
-        <!-- Admin Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-menu">
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 1rem 0 0.5rem 1.5rem; color: var(--text-muted);">Admin Panel</p>
-                <a href="#dashboard" class="active"><i class="uil uil-apps"></i> Dashboard</a>
-                <a href="#users"><i class="uil uil-users-alt"></i> Manage Users</a>
-                <a href="#artists"><i class="uil uil-palette"></i> Manage Artists</a>
-                <a href="#artworks"><i class="uil uil-image"></i> Manage Artworks</a>
-                <a href="#collections"><i class="uil uil-layer-group"></i> Manage Collections</a>
-                <a href="#orders"><i class="uil uil-receipt"></i> Orders</a>
-                
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 2rem 0 0.5rem 1.5rem; color: var(--text-muted);">System</p>
-                <a href="#reports"><i class="uil uil-file-alt"></i> Reports</a>
-                <a href="#analytics"><i class="uil uil-chart-pie"></i> Analytics</a>
-                <a href="#notifications"><i class="uil uil-bell"></i> Notifications</a>
-                <a href="#settings"><i class="uil uil-setting"></i> Site Settings</a>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <aside class="sidebar" id="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+                <button class="toggle-desktop-sidebar" id="toggle-desktop-sidebar"><i class="uil uil-left-arrow-to-left"></i></button>
+                <button class="close-sidebar" id="close-sidebar"><i class="uil uil-times"></i></button>
             </div>
-            <div class="sidebar-footer">
-                <div class="sidebar-profile">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=100&auto=format&fit=crop" alt="Admin">
-                    <div style="flex: 1;"><h5 style="margin: 0; font-size: 0.95rem;">Admin User</h5><p style="margin: 0; font-size: 0.8rem;">Super Admin</p></div>
-                    <a href="index.html" style="color: var(--accent-3);"><i class="uil uil-sign-out-alt"></i></a>
+            <div class="sidebar-user-card">
+                <img loading="lazy" src="IMAGE/retro furture.webp" alt="Admin">
+                <div>
+                    <h6>Super Admin</h6>
+                    <p>Platform Administrator</p>
                 </div>
+            </div>
+            <div class="sidebar-menu">
+                <p class="sidebar-section-title">Overview</p>
+                <a href="#dashboard" class="dash-link active"><i class="uil uil-apps"></i> <span>Dashboard</span></a>
+                <a href="#analytics" class="dash-link"><i class="uil uil-chart-line"></i> <span>Analytics</span></a>
+
+                <p class="sidebar-section-title">Users</p>
+                <a href="#users" class="dash-link"><i class="uil uil-users-alt"></i> <span>Manage Users</span></a>
+                <a href="#artists" class="dash-link"><i class="uil uil-palette"></i> <span>Manage Artists</span></a>
+
+                <p class="sidebar-section-title">Content</p>
+                <a href="#artworks" class="dash-link"><i class="uil uil-image-check"></i> <span>Artwork Approval</span> <span class="alert-dot">7</span></a>
+                <a href="#marketplace" class="dash-link"><i class="uil uil-store"></i> <span>Marketplace</span></a>
+                <a href="#collections" class="dash-link"><i class="uil uil-layer-group"></i> <span>Collections</span></a>
+
+                <p class="sidebar-section-title">Platform</p>
+                <a href="#transactions" class="dash-link"><i class="uil uil-exchange"></i> <span>Transactions</span></a>
+                <a href="#reports" class="dash-link"><i class="uil uil-file-alt"></i> <span>Reports</span></a>
+                <a href="#notifications" class="dash-link"><i class="uil uil-bell"></i> <span>Notifications</span> <span class="alert-dot">5</span></a>
+                
+                <p class="sidebar-section-title">System</p>
+                <a href="#settings" class="dash-link"><i class="uil uil-setting"></i> <span>Site Settings</span></a>
+                <a href="#security" class="dash-link"><i class="uil uil-shield-check"></i> <span>Security</span></a>
+                <a href="login.html" class="logout-link dash-link"><i class="uil uil-sign-out-alt"></i> <span>Logout</span></a>
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <header class="dashboard-header reveal" style="position: relative;">
-                <div><h2 style="margin: 0;">Admin Control Panel</h2><p style="margin: 0; font-size: 0.9rem;">System status and platform management.</p></div>
-                <div style="position: absolute; left: 50%; transform: translateX(-50%);">
-                    <a href="index.html" class="logo"><img src="lo.webp" alt="Logo" style="height: 40px;"></a>
+            <header class="dashboard-header">
+                <div>
+                    <h2 id="page-title">Admin Control Panel</h2>
+                    <p id="page-subtitle">Platform health and management overview.</p>
                 </div>
-                <div class="search-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.5rem; border-radius: var(--radius-full); display: flex; gap: 0.8rem; width: 300px;">
-                    <i class="uil uil-search" style="color: var(--text-muted);"></i>
-                    <input type="text" placeholder="Search ID or User..." style="background: transparent; border: none; color: white; outline: none; width: 100%;">
+                <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                    <button class="btn-sm btn-outline-sm"><i class="uil uil-file-export"></i> Export Report</button>
+                    <button class="btn-sm btn-primary-sm"><i class="uil uil-plus"></i> Add Content</button>
                 </div>
             </header>
 
+            <!-- 1. CONTROL PANEL -->
             <div id="dashboard" class="tab-content active-tab">
-                <div class="grid-4 reveal stagger-1">
-                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Total Users</p><h3 style="margin: 0;">125.4K</h3>
+                <!-- Platform Stats -->
+                <div class="grid-4" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal">
+                        <div><p>Total Users</p><h2>24,812</h2><div class="trend"><i class="uil uil-arrow-up"></i> +342 this week</div></div>
+                        <div class="stat-icon" style="background:rgba(0,229,255,0.12);color:var(--accent-cyan);"><i class="uil uil-users-alt"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div><p>Active Artists</p><h2>3,291</h2><div class="trend"><i class="uil uil-arrow-up"></i> +48 this week</div></div>
+                        <div class="stat-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-violet);"><i class="uil uil-palette"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div><p>Total Artworks</p><h2>89,443</h2><div class="trend"><i class="uil uil-arrow-up"></i> +1,200 this week</div></div>
+                        <div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="uil uil-image"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div><p>Monthly Revenue</p><h2>$284K</h2><div class="trend"><i class="uil uil-arrow-up"></i> +18% vs last month</div></div>
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="uil uil-money-bill"></i></div>
+                    </div>
+                </div>
+
+                <!-- Charts + Alerts -->
+                <div class="grid-2" style="margin-bottom:2rem;">
+                    <div class="chart-wrap">
+                        <div class="section-header" style="margin-bottom:0.5rem;"><h3>Monthly Revenue</h3><span style="font-size:0.82rem;color:#f59e0b;">USD</span></div>
+                        <p style="margin:0 0 1rem;font-size:0.82rem;color:var(--text-muted);">Platform revenue per month</p>
+                        <div class="chart-bars">
+                            <div class="bar-item"><div class="bar" style="height:42%;"></div><span class="bar-label">Jan</span></div>
+                            <div class="bar-item"><div class="bar" style="height:55%;"></div><span class="bar-label">Feb</span></div>
+                            <div class="bar-item"><div class="bar" style="height:48%;"></div><span class="bar-label">Mar</span></div>
+                            <div class="bar-item"><div class="bar" style="height:62%;"></div><span class="bar-label">Apr</span></div>
+                            <div class="bar-item"><div class="bar" style="height:70%;"></div><span class="bar-label">May</span></div>
+                            <div class="bar-item"><div class="bar" style="height:80%;"></div><span class="bar-label">Jun</span></div>
+                            <div class="bar-item"><div class="bar" style="height:75%;"></div><span class="bar-label">Jul</span></div>
+                            <div class="bar-item"><div class="bar" style="height:88%;"></div><span class="bar-label">Aug</span></div>
+                            <div class="bar-item"><div class="bar" style="height:95%;"></div><span class="bar-label">Sep</span></div>
+                            <div class="bar-item"><div class="bar" style="height:85%;"></div><span class="bar-label">Oct</span></div>
+                            <div class="bar-item"><div class="bar" style="height:70%;"></div><span class="bar-label">Nov</span></div>
+                            <div class="bar-item"><div class="bar" style="height:100%;"></div><span class="bar-label">Dec</span></div>
                         </div>
                     </div>
-                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Total Artists</p><h3 style="margin: 0;">8.2K</h3>
-                        </div>
-                    </div>
-                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Platform Volume</p><h3 style="margin: 0;">$4.5M</h3>
-                        </div>
-                    </div>
-                    <div class="stat-card tilt-card" style="padding: 1.5rem;">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.2rem; font-size: 0.8rem;">Active Disputes</p><h3 style="margin: 0; color: var(--accent-3);">12</h3>
+                    <div>
+                        <div class="section-header"><h3>🚨 System Alerts</h3><a href="#notifications" class="dash-link-trigger">View All</a></div>
+                        <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;overflow:hidden;">
+                            <div class="alert-item"><div class="alert-icon" style="background:rgba(239,68,68,0.2);color:#ef4444;"><i class="uil uil-exclamation-triangle"></i></div><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Artwork Flagged</h6><p style="margin:0;font-size:0.8rem;color:var(--text-muted);">3 artworks flagged for copyright review</p><p style="margin:0.2rem 0 0;font-size:0.72rem;color:var(--text-muted);">5 min ago</p></div></div>
+                            <div class="alert-item"><div class="alert-icon" style="background:rgba(245,158,11,0.2);color:#f59e0b;"><i class="uil uil-user-exclamation"></i></div><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">New Artist Applications</h6><p style="margin:0;font-size:0.8rem;color:var(--text-muted);">12 new applications awaiting review</p><p style="margin:0.2rem 0 0;font-size:0.72rem;color:var(--text-muted);">1 hour ago</p></div></div>
+                            <div class="alert-item"><div class="alert-icon" style="background:rgba(59,130,246,0.2);color:#60a5fa;"><i class="uil uil-server"></i></div><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Server Load</h6><p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Server CPU at 78% — monitoring closely</p><p style="margin:0.2rem 0 0;font-size:0.72rem;color:var(--text-muted);">2 hours ago</p></div></div>
+                            <div class="alert-item"><div class="alert-icon" style="background:rgba(16,185,129,0.2);color:#10b981;"><i class="uil uil-check-circle"></i></div><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Daily Backup Complete</h6><p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Database backup completed successfully</p><p style="margin:0.2rem 0 0;font-size:0.72rem;color:var(--text-muted);">4 hours ago</p></div></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="table-container reveal stagger-2">
-                    <h3 style="margin-bottom: 1.5rem;">Recent Platform Activity</h3>
+                <!-- Quick Actions + Recent Activity -->
+                <div class="grid-2">
+                    <div>
+                        <div class="section-header"><h3>Quick Actions</h3></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <button class="btn-sm btn-outline-sm" style="padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;font-size:0.85rem;border-radius:14px;" onclick="document.querySelector('.dash-link[href=\'#artworks\']').click()"><i class="uil uil-image-check" style="font-size:1.8rem;color:var(--accent-amber);"></i>Review Artworks<span class="alert-dot" style="margin:0;">7</span></button>
+                            <button class="btn-sm btn-outline-sm" style="padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;font-size:0.85rem;border-radius:14px;" onclick="document.querySelector('.dash-link[href=\'#artists\']').click()"><i class="uil uil-palette" style="font-size:1.8rem;color:var(--accent-violet);"></i>Artist Approvals<span class="alert-dot" style="margin:0;background:var(--accent-violet);">12</span></button>
+                            <button class="btn-sm btn-outline-sm" style="padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;font-size:0.85rem;border-radius:14px;"><i class="uil uil-file-export" style="font-size:1.8rem;color:#10b981;"></i>Export Data</button>
+                            <button class="btn-sm btn-outline-sm" style="padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.5rem;font-size:0.85rem;border-radius:14px;"><i class="uil uil-envelope-send" style="font-size:1.8rem;color:var(--accent-cyan);"></i>Broadcast Email</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="section-header"><h3>Platform Health</h3></div>
+                        <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:1.5rem;">
+                            <div style="margin-bottom:1.25rem;"><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Server Uptime</span><span style="color:#10b981;font-weight:600;">99.9%</span></div><div style="height:6px;background:rgba(255,255,255,0.1);border-radius:10px;"><div style="width:99.9%;height:100%;background:#10b981;border-radius:10px;"></div></div></div>
+                            <div style="margin-bottom:1.25rem;"><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Storage Used</span><span style="color:#f59e0b;font-weight:600;">72%</span></div><div style="height:6px;background:rgba(255,255,255,0.1);border-radius:10px;"><div style="width:72%;height:100%;background:#f59e0b;border-radius:10px;"></div></div></div>
+                            <div style="margin-bottom:1.25rem;"><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>CPU Load</span><span style="color:#ef4444;font-weight:600;">78%</span></div><div style="height:6px;background:rgba(255,255,255,0.1);border-radius:10px;"><div style="width:78%;height:100%;background:#ef4444;border-radius:10px;"></div></div></div>
+                            <div><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Bandwidth</span><span style="color:var(--accent-cyan);font-weight:600;">45%</span></div><div style="height:6px;background:rgba(255,255,255,0.1);border-radius:10px;"><div style="width:45%;height:100%;background:var(--accent-cyan);border-radius:10px;"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. REVENUE ANALYTICS -->
+            <div id="analytics" class="tab-content">
+                <div class="grid-4" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal"><div><p>Total Revenue (YTD)</p><h2>$2.4M</h2><div class="trend"><i class="uil uil-arrow-up"></i> +34% vs last year</div></div><div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="uil uil-money-bill"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Platform Fee Collected</p><h2>$144K</h2><div class="trend"><i class="uil uil-arrow-up"></i> +18%</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="uil uil-percentage"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Avg Order Value</p><h2>$320</h2><div class="trend"><i class="uil uil-arrow-up"></i> +$40 this month</div></div><div class="stat-icon" style="background:rgba(0,229,255,0.12);color:var(--accent-cyan);"><i class="uil uil-chart-line"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Active Subscriptions</p><h2>1,842</h2><div class="trend"><i class="uil uil-arrow-up"></i> +120 this month</div></div><div class="stat-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-violet);"><i class="uil uil-star"></i></div></div>
+                </div>
+                <div class="grid-2">
+                    <div class="chart-wrap"><div class="section-header" style="margin-bottom:0.5rem;"><h3>Revenue by Month</h3></div><p style="margin:0 0 1rem;font-size:0.82rem;color:var(--text-muted);">USD revenue (in thousands)</p><div class="chart-bars"><div class="bar-item"><div class="bar" style="height:38%;"></div><span class="bar-label">Jan</span></div><div class="bar-item"><div class="bar" style="height:50%;"></div><span class="bar-label">Feb</span></div><div class="bar-item"><div class="bar" style="height:60%;"></div><span class="bar-label">Mar</span></div><div class="bar-item"><div class="bar" style="height:75%;"></div><span class="bar-label">Apr</span></div><div class="bar-item"><div class="bar" style="height:68%;"></div><span class="bar-label">May</span></div><div class="bar-item"><div class="bar" style="height:82%;"></div><span class="bar-label">Jun</span></div><div class="bar-item"><div class="bar" style="height:91%;"></div><span class="bar-label">Jul</span></div><div class="bar-item"><div class="bar" style="height:87%;"></div><span class="bar-label">Aug</span></div><div class="bar-item"><div class="bar" style="height:95%;"></div><span class="bar-label">Sep</span></div><div class="bar-item"><div class="bar" style="height:100%;"></div><span class="bar-label">Oct</span></div><div class="bar-item"><div class="bar" style="height:88%;"></div><span class="bar-label">Nov</span></div><div class="bar-item"><div class="bar" style="height:97%;"></div><span class="bar-label">Dec</span></div></div></div>
+                    <div><div class="section-header"><h3>Revenue by Category</h3></div><div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:1.5rem;"><div style="display:flex;flex-direction:column;gap:1rem;"><div><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Abstract</span><span style="color:#f59e0b;font-weight:600;">$620K</span></div><div style="height:7px;background:rgba(255,255,255,0.08);border-radius:10px;"><div style="width:65%;height:100%;background:var(--accent-amber, #f59e0b);border-radius:10px;"></div></div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Cyberpunk</span><span style="color:var(--accent-violet);font-weight:600;">$480K</span></div><div style="height:7px;background:rgba(255,255,255,0.08);border-radius:10px;"><div style="width:50%;height:100%;background:var(--accent-violet);border-radius:10px;"></div></div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Photography</span><span style="color:var(--accent-cyan);font-weight:600;">$360K</span></div><div style="height:7px;background:rgba(255,255,255,0.08);border-radius:10px;"><div style="width:38%;height:100%;background:var(--accent-cyan);border-radius:10px;"></div></div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>3D Art</span><span style="color:#10b981;font-weight:600;">$280K</span></div><div style="height:7px;background:rgba(255,255,255,0.08);border-radius:10px;"><div style="width:29%;height:100%;background:#10b981;border-radius:10px;"></div></div></div><div><div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.85rem;"><span>Generative</span><span style="color:#60a5fa;font-weight:600;">$180K</span></div><div style="height:7px;background:rgba(255,255,255,0.08);border-radius:10px;"><div style="width:19%;height:100%;background:#60a5fa;border-radius:10px;"></div></div></div></div></div></div>
+                </div>
+            </div>
+
+            <!-- 3. MANAGE USERS -->
+            <div id="users" class="tab-content">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;"><button class="btn-sm btn-primary-sm">All (24,812)</button><button class="btn-sm btn-outline-sm">Active</button><button class="btn-sm btn-outline-sm">Banned</button></div>
+                    <button class="btn-sm btn-outline-sm"><i class="uil uil-file-export"></i> Export Users</button>
+                </div>
+                <div class="table-card">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>#</th><th>User</th><th>Email</th><th>Joined</th><th>Purchases</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody>
-                            <tr>
-                                <td>@jane_doe</td>
-                                <td>Minted NFT "Neon 1"</td>
-                                <td>2 mins ago</td>
-                                <td><span class="status active">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>@marcus_v</td>
-                                <td>Requested Artist Verification</td>
-                                <td>1 hour ago</td>
-                                <td><span class="status pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>@crypto_king</td>
-                                <td>Purchased Artwork #442</td>
-                                <td>3 hours ago</td>
-                                <td><span class="status active">Completed</span></td>
-                            </tr>
+                            <tr><td>1</td><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/ryu.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="U"><span>Jane Doe</span></div></td><td>jane@example.com</td><td>Jan 12, 2025</td><td>$4,200</td><td><span class="status-badge badge-success">Active</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-ban"></i></button></td></tr>
+                            <tr><td>2</td><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/sarah jankins.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="U"><span>Alex Krane</span></div></td><td>alex@email.com</td><td>Feb 5, 2025</td><td>$8,100</td><td><span class="status-badge badge-success">Active</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-ban"></i></button></td></tr>
+                            <tr><td>3</td><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/sophie cover.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="U"><span>Sophia Lin</span></div></td><td>sophia@art.io</td><td>Mar 18, 2025</td><td>$1,700</td><td><span class="status-badge badge-success">Active</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-ban"></i></button></td></tr>
+                            <tr><td>4</td><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/sophie.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="U"><span>Mike Roberts</span></div></td><td>mike.r@mail.com</td><td>Apr 2, 2025</td><td>$320</td><td><span class="status-badge badge-reject">Banned</span></td><td><button class="action-btn approve"><i class="uil uil-check-circle"></i></button><button class="action-btn reject"><i class="uil uil-trash-alt"></i></button></td></tr>
+                            <tr><td>5</td><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/theo cover.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="U"><span>Mia Chen</span></div></td><td>mia@chen.io</td><td>May 20, 2025</td><td>$560</td><td><span class="status-badge badge-success">Active</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-ban"></i></button></td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            <!-- Other Tabs Placeholder -->
-            <div id="users" class="tab-content"><h2 style="margin-bottom: 2rem;">User Management</h2><p style="color: var(--text-muted);">Full list of users will appear here.</p></div>
-            <div id="artworks" class="tab-content"><h2 style="margin-bottom: 2rem;">Artwork Moderation</h2><p style="color: var(--text-muted);">Pending artworks for review.</p></div>
-            <div id="collections" class="tab-content"><h2 style="margin-bottom: 2rem;">Collections</h2><p style="color: var(--text-muted);">Platform collections management.</p></div>
-            <div id="transactions" class="tab-content"><h2 style="margin-bottom: 2rem;">Transactions</h2><p style="color: var(--text-muted);">Platform-wide financial ledger.</p></div>
-            <div id="reports" class="tab-content"><h2 style="margin-bottom: 2rem;">Reports & Analytics</h2><p style="color: var(--text-muted);">Generate financial and growth reports.</p></div>
-            <div id="disputes" class="tab-content"><h2 style="margin-bottom: 2rem;">Dispute Resolution</h2><p style="color: var(--text-muted);">Active tickets and user disputes.</p></div>
-            <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">System Settings</h2><p style="color: var(--text-muted);">Global configuration variables.</p></div>
 
-            <!-- Footer -->
-    <footer style="margin-top: 4rem;">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
-                        <img src="lo.webp" alt="Stackly Logo">
-                    </a>
-                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
-                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+            <!-- 4. ARTIST APPLICATIONS -->
+            <div id="artists" class="tab-content">
+                <div class="table-card">
+                    <div class="section-header" style="margin-bottom:1.5rem;"><h3>Pending Applications (12)</h3><span style="font-size:0.85rem;color:var(--text-muted);">Review each profile before approving</span></div>
+                    <table>
+                        <thead><tr><th>Artist</th><th>Portfolio</th><th>Applied</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/theo.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="A"><span>Marcus Vale</span></div></td><td><a href="#" style="color:var(--accent-cyan);font-size:0.85rem;">View Portfolio</a></td><td>Oct 10, 2025</td><td>Cyberpunk</td><td><span class="status-badge badge-pending">Pending</span></td><td><button class="action-btn approve"><i class="uil uil-check-circle"></i></button><button class="action-btn reject"><i class="uil uil-times-circle"></i></button></td></tr>
+                            <tr><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/zara cover.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="A"><span>Clara Smith</span></div></td><td><a href="#" style="color:var(--accent-cyan);font-size:0.85rem;">View Portfolio</a></td><td>Oct 8, 2025</td><td>Abstract</td><td><span class="status-badge badge-pending">Pending</span></td><td><button class="action-btn approve"><i class="uil uil-check-circle"></i></button><button class="action-btn reject"><i class="uil uil-times-circle"></i></button></td></tr>
+                            <tr><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/zara.webp" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="A"><span>James Park</span></div></td><td><a href="#" style="color:var(--accent-cyan);font-size:0.85rem;">View Portfolio</a></td><td>Oct 6, 2025</td><td>Photography</td><td><span class="status-badge badge-success">Approved</span></td><td><button class="action-btn reject"><i class="uil uil-ban"></i></button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. ARTWORK APPROVALS -->
+            <div id="artworks" class="tab-content">
+                <div class="table-card">
+                    <div class="section-header" style="margin-bottom:1.5rem;"><h3>Pending Artwork Reviews (7)</h3><button class="btn-sm btn-success-sm">Approve All</button></div>
+                    <table>
+                        <thead><tr><th>Artwork</th><th>Artist</th><th>Category</th><th>Price</th><th>Submitted</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/about hero.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><span>Neon Genesis</span></div></td><td>@marcus_v</td><td>Cyberpunk</td><td>0.8 ETH</td><td>Oct 12, 2025</td><td><button class="action-btn approve"><i class="uil uil-check-circle"></i></button><button class="action-btn reject"><i class="uil uil-times-circle"></i></button><button class="action-btn view"><i class="uil uil-eye"></i></button></td></tr>
+                            <tr><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/abstract dimension.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><span>Abstract Dimensions</span></div></td><td>@sarah_art</td><td>Abstract</td><td>1.2 ETH</td><td>Oct 10, 2025</td><td><button class="action-btn approve"><i class="uil uil-check-circle"></i></button><button class="action-btn reject"><i class="uil uil-times-circle"></i></button><button class="action-btn view"><i class="uil uil-eye"></i></button></td></tr>
+                            <tr><td><div style="display:flex;align-items:center;gap:0.75rem;"><img loading="lazy" src="IMAGE/abstract visions.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><span>Cyberpunk City</span></div></td><td>@neo_creator</td><td>Cyber</td><td>2.5 ETH</td><td>Oct 9, 2025</td><td><button class="action-btn approve"><i class="uil uil-check-circle"></i></button><button class="action-btn reject"><i class="uil uil-times-circle"></i></button><button class="action-btn view"><i class="uil uil-eye"></i></button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. COLLECTIONS -->
+            <div id="collections" class="tab-content">
+                <div class="table-card">
+                    <div class="section-header" style="margin-bottom:1.5rem;"><h3>All Collections (342)</h3><button class="btn-sm btn-primary-sm"><i class="uil uil-plus"></i> Create Featured</button></div>
+                    <table>
+                        <thead><tr><th>Collection</th><th>Artist</th><th>Items</th><th>Volume</th><th>Created</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr><td>Neon Futures</td><td>@marcus_v</td><td>12</td><td>18.4 ETH</td><td>Oct 1, 2025</td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-trash-alt"></i></button></td></tr>
+                            <tr><td>Cosmic Abstracts</td><td>@sarah_art</td><td>8</td><td>11.2 ETH</td><td>Sep 15, 2025</td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-trash-alt"></i></button></td></tr>
+                            <tr><td>Digital Serenity</td><td>@aether</td><td>15</td><td>22.7 ETH</td><td>Sep 1, 2025</td><td><button class="action-btn view"><i class="uil uil-eye"></i></button><button class="action-btn reject"><i class="uil uil-trash-alt"></i></button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 7. REPORTS -->
+            <div id="reports" class="tab-content">
+                <div class="grid-3" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal"><div><p>Open Reports</p><h2>14</h2><div class="trend" style="color:#ef4444;"><i class="uil uil-exclamation-triangle"></i> 3 urgent</div></div><div class="stat-icon" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="uil uil-file-exclamation-alt"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Resolved This Month</p><h2>87</h2><div class="trend"><i class="uil uil-arrow-up"></i> +12 this week</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="uil uil-check-circle"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Avg Resolution Time</p><h2>4.2h</h2><div class="trend" style="color:var(--text-muted);">Target: &lt;6 hours</div></div><div class="stat-icon" style="background:rgba(0,229,255,0.12);color:var(--accent-cyan);"><i class="uil uil-clock"></i></div></div>
+                </div>
+                <div class="table-card">
+                    <div class="section-header" style="margin-bottom:1.5rem;"><h3>Active Reports</h3><button class="btn-sm btn-outline-sm">Export</button></div>
+                    <table>
+                        <thead><tr><th>Report ID</th><th>Type</th><th>Reported By</th><th>Against</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr><td>#RPT-0441</td><td>Copyright Claim</td><td>@clara_art</td><td>@anon_pixel</td><td><span class="status-badge badge-reject">Urgent</span></td><td><span class="status-badge badge-pending">Open</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button></td></tr>
+                            <tr><td>#RPT-0440</td><td>Inappropriate Content</td><td>@jane_doe</td><td>@bad_actor</td><td><span class="status-badge badge-pending">Medium</span></td><td><span class="status-badge badge-pending">Open</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button></td></tr>
+                            <tr><td>#RPT-0439</td><td>Scam / Fraud</td><td>@alex_k</td><td>@fake_art</td><td><span class="status-badge badge-reject">Urgent</span></td><td><span class="status-badge badge-processing">In Review</span></td><td><button class="action-btn view"><i class="uil uil-eye"></i></button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 8. TRANSACTIONS -->
+            <div id="transactions" class="tab-content">
+                <div class="grid-3" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal"><div><p>Total Transactions</p><h2>12,844</h2><div class="trend"><i class="uil uil-arrow-up"></i> +842 this month</div></div><div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="uil uil-exchange"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Total Volume</p><h2>$2.4M</h2><div class="trend"><i class="uil uil-arrow-up"></i> +18% this month</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="uil uil-money-bill"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Failed Transactions</p><h2>23</h2><div class="trend" style="color:#ef4444;"><i class="uil uil-exclamation-triangle"></i> 0.18% rate</div></div><div class="stat-icon" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="uil uil-times-circle"></i></div></div>
+                </div>
+                <div class="table-card">
+                    <div class="section-header" style="margin-bottom:1.5rem;"><h3>Recent Transactions</h3><button class="btn-sm btn-outline-sm">Export CSV</button></div>
+                    <table>
+                        <thead><tr><th>TX ID</th><th>Buyer</th><th>Artwork</th><th>Amount</th><th>Platform Fee</th><th>Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td>#TX-9841</td><td>@jane_doe</td><td>Neon Genesis</td><td>0.8 ETH</td><td>0.04 ETH</td><td>Oct 12</td><td><span class="status-badge badge-success">Success</span></td></tr>
+                            <tr><td>#TX-9840</td><td>@alex_k</td><td>Abstract Dims</td><td>1.2 ETH</td><td>0.06 ETH</td><td>Sep 28</td><td><span class="status-badge badge-success">Success</span></td></tr>
+                            <tr><td>#TX-9839</td><td>@pixel_hunter</td><td>Cyberpunk City</td><td>2.5 ETH</td><td>0.125 ETH</td><td>Sep 15</td><td><span class="status-badge badge-success">Success</span></td></tr>
+                            <tr><td>#TX-9838</td><td>@nft_whale</td><td>Aurora Borealis</td><td>4.9 ETH</td><td>0.245 ETH</td><td>Sep 1</td><td><span class="status-badge badge-processing">Pending</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 9. SYSTEM ALERTS -->
+            <div id="notifications" class="tab-content">
+                <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;overflow:hidden;">
+                    <div class="alert-item"><div class="alert-icon" style="background:rgba(239,68,68,0.2);color:#ef4444;"><i class="uil uil-exclamation-triangle"></i></div><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6 style="margin:0 0 0.2rem;">Copyright Violation Flagged</h6><span style="font-size:0.75rem;color:var(--text-muted);">5 min ago</span></div><p style="margin:0;font-size:0.85rem;color:var(--text-muted);">3 artworks submitted by @anon_pixel match existing copyrighted works. Immediate review required.</p></div></div>
+                    <div class="alert-item"><div class="alert-icon" style="background:rgba(245,158,11,0.2);color:#f59e0b;"><i class="uil uil-user-exclamation"></i></div><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6 style="margin:0 0 0.2rem;">Artist Application Backlog</h6><span style="font-size:0.75rem;color:var(--text-muted);">1 hour ago</span></div><p style="margin:0;font-size:0.85rem;color:var(--text-muted);">12 applications have been pending for more than 48 hours. Review needed.</p></div></div>
+                    <div class="alert-item"><div class="alert-icon" style="background:rgba(239,68,68,0.2);color:#ef4444;"><i class="uil uil-server"></i></div><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6 style="margin:0 0 0.2rem;">High CPU Warning</h6><span style="font-size:0.75rem;color:var(--text-muted);">2 hours ago</span></div><p style="margin:0;font-size:0.85rem;color:var(--text-muted);">Server CPU at 78%. Approaching performance threshold. Consider scaling up.</p></div></div>
+                    <div class="alert-item"><div class="alert-icon" style="background:rgba(59,130,246,0.2);color:#60a5fa;"><i class="uil uil-shield-check"></i></div><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6 style="margin:0 0 0.2rem;">Suspicious Login Detected</h6><span style="font-size:0.75rem;color:var(--text-muted);">4 hours ago</span></div><p style="margin:0;font-size:0.85rem;color:var(--text-muted);">Admin account accessed from new location (Singapore). Verified by 2FA.</p></div></div>
+                    <div class="alert-item"><div class="alert-icon" style="background:rgba(16,185,129,0.2);color:#10b981;"><i class="uil uil-database"></i></div><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6 style="margin:0 0 0.2rem;">Database Backup Complete</h6><span style="font-size:0.75rem;color:var(--text-muted);">6 hours ago</span></div><p style="margin:0;font-size:0.85rem;color:var(--text-muted);">Full database backup completed. 847GB stored to secure cloud archive.</p></div></div>
+                </div>
+            </div>
+
+            <!-- 10. SITE SETTINGS -->
+            <div id="settings" class="tab-content">
+                <div style="max-width:700px;">
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-cog"></i> General Platform Settings</h4>
+                        <div class="form-group"><label class="form-label">Platform Name</label><input type="text" class="form-input" value="Stackly"></div>
+                        <div class="form-group"><label class="form-label">Platform URL</label><input type="url" class="form-input" value="https://stackly.art"></div>
+                        <div class="form-group"><label class="form-label">Platform Commission (%)</label><input type="number" class="form-input" value="5" min="0" max="30"></div>
+                        <div class="form-group"><label class="form-label">Support Email</label><input type="email" class="form-input" value="support@stackly.art"></div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.7rem 1.5rem;">Save Settings</button>
+                    </div>
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-toggle-on"></i> Feature Flags</h4>
+                        <div class="toggle-row"><div><h6>Artwork Approvals Required</h6><p>All new artworks need admin review before publishing</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div><h6>Artist Applications</h6><p>Allow new creators to apply for artist status</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div><h6>Maintenance Mode</h6><p>Show maintenance page to all visitors</p></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div><h6>Referral Program</h6><p>Enable user referral bonuses</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                    </div>
+                    <div class="settings-card reveal" style="border-color:rgba(239,68,68,0.2);">
+                        <h4 style="color:#ef4444;"><i class="uil uil-database-alt"></i> Database Management</h4>
+                        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">Perform system-level operations with caution.</p>
+                        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                            <button class="btn-sm btn-outline-sm">Manual Backup</button>
+                            <button class="btn-sm btn-outline-sm">Clear Cache</button>
+                            <button class="btn-sm btn-danger-sm">Purge CDN</button>
+                        </div>
                     </div>
                 </div>
-                <div class="footer-col">
-                    <h4>Marketplace</h4>
-                    <ul class="footer-links">
-                        <li><a href="404.html">All Artworks</a></li>
-                        <li><a href="404.html">New Releases</a></li>
-                        <li><a href="404.html">Top Artists</a></li>
-                        <li><a href="404.html">Collections</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>My Account</h4>
-                    <ul class="footer-links">
-                        <li><a href="login.html">Profile</a></li>
-                        <li><a href="404.html">Favorites</a></li>
-                        <li><a href="404.html">My Collections</a></li>
-                        <li><a href="404.html">Settings</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="404.html">Careers</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="404.html">Privacy Policy</a></li>
-                    </ul>
+            </div>
+
+            <!-- MARKETPLACE (Placeholder) -->
+            <div id="marketplace" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-store" style="font-size:3rem; color:var(--accent-cyan); display:block; margin-bottom:1rem;"></i>
+                    <h4>Marketplace Management</h4>
+                    <p>Coming soon: Adjust marketplace fees, view active listings, and promote items.</p>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Stackly. All rights reserved.</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <a href="404.html">Terms</a>
-                    <a href="404.html">Privacy</a>
+
+            <!-- SECURITY (Placeholder) -->
+            <div id="security" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-shield-check" style="font-size:3rem; color:#10b981; display:block; margin-bottom:1rem;"></i>
+                    <h4>Security Settings</h4>
+                    <p>Coming soon: 2FA enforcement, login activity logs, and IP whitelisting.</p>
                 </div>
             </div>
-        </div>
-    </footer>
+
+            <footer><div>&copy; 2026 Stackly Admin Panel. All rights reserved.</div></footer>
         </main>
     </div>
-    <script src="js/main.js?v=2"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/dashboards.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+

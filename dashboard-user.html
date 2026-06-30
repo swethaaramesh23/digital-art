@@ -7,224 +7,827 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        body { background-color: var(--bg-darker); }
-        .dashboard-layout { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 280px; background: rgba(20,20,25,0.8); backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
-            position: fixed; height: 100vh; z-index: 100;
+        * { box-sizing: border-box; }
+        body { background-color: var(--bg-darker); margin: 0; }
+        .dashboard-layout { display: block !important; width: 100%; min-height: 100vh; }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none; padding: 1rem 1.5rem;
+            background: rgba(20,20,25,0.97); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            justify-content: space-between; align-items: center;
         }
-        .sidebar-header { padding: 2rem; border-bottom: 1px solid var(--glass-border); }
-        .sidebar-menu { flex: 1; padding: 2rem 1rem; overflow-y: auto; }
-        .sidebar-menu::-webkit-scrollbar { width: 4px; }
-        .sidebar-menu a {
-            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
-            color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;
-            transition: var(--transition-fast);
+        .hamburger-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; }
+
+        /* Sidebar */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(5,5,8,0.8); z-index: 1040; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .sidebar { width: var(--sidebar-width, 280px); background: rgba(15,15,20,0.98); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 1050; transition: width 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.3s; }
+        .sidebar.collapsed { width: var(--sidebar-mini-width, 80px); }
+        .sidebar.collapsed .sidebar-logo span, .sidebar.collapsed .sidebar-user-card div, .sidebar.collapsed .sidebar-menu a span, .sidebar.collapsed .sidebar-section-title, .sidebar.collapsed .alert-dot { display: none; }
+        .sidebar.collapsed .sidebar-menu a { justify-content: center; padding: 0.75rem 0; }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 1.25rem 0; }
+        .sidebar.collapsed .sidebar-user-card { padding: 0.5rem; justify-content: center; background: transparent; border-color: transparent; }
+        
+        .sidebar-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+        .sidebar-logo img { height: 26px; }
+        .sidebar-logo span { font-weight: 700; font-size: 1.05rem; color: #fff; white-space: nowrap; }
+        .close-sidebar { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; }
+        .toggle-desktop-sidebar { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .toggle-desktop-sidebar:hover { color: #fff; }
+
+        .sidebar-user-card { margin: 1rem; padding: 1rem; border-radius: 12px; background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; transition: 0.3s; white-space: nowrap; overflow: hidden; }
+        .sidebar-user-card img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,229,255,0.3); }
+        .sidebar-user-card h6 { margin: 0; font-size: 0.9rem; color: #fff; }
+        .sidebar-user-card p { margin: 0; font-size: 0.75rem; color: var(--text-muted); }
+
+        .sidebar-menu { flex: 1; padding: 0.5rem 0.75rem 1rem; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-menu::-webkit-scrollbar { width: 3px; }
+        .sidebar-section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; padding: 1rem 0.75rem 0.4rem; margin: 0; white-space: nowrap; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1rem; color: var(--text-muted); border-radius: 10px; margin-bottom: 0.15rem; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; text-decoration: none; white-space: nowrap; }
+        .sidebar-menu a i { font-size: 1.1rem; width: 22px; text-align: center; transition: transform 0.2s; }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .sidebar-menu a:hover i { transform: rotate(-10deg) scale(1.1); }
+        .sidebar-menu a.active { background: rgba(0,229,255,0.12); color: #fff; border-left: 3px solid var(--accent-cyan); box-shadow: inset 2px 0 10px rgba(0,229,255,0.1); }
+        .sidebar-menu a.active i { color: var(--accent-cyan); }
+        .sidebar-menu a.logout-link { color: #ef4444; }
+        .sidebar-menu a.logout-link:hover { background: rgba(239,68,68,0.1); }
+        .alert-dot { margin-left: auto; background: #ef4444; color: #fff; border-radius: 12px; padding: 1px 7px; font-size: 0.68rem; font-weight: 700; }
+
+        .main-content { margin-left: var(--sidebar-width, 280px); width: calc(100% - var(--sidebar-width, 280px)); padding: 2rem 2.5rem; min-height: 100vh; box-sizing: border-box; transition: margin-left 0.3s cubic-bezier(0.16,1,0.3,1), width 0.3s cubic-bezier(0.16,1,0.3,1); }
+        body.sidebar-collapsed .main-content { margin-left: var(--sidebar-mini-width, 80px); width: calc(100% - var(--sidebar-mini-width, 80px)); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .dashboard-header h2 { margin: 0; font-size: 1.7rem; background: var(--gradient-violet); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .dashboard-header p { margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--text-muted); }
+        .header-actions { display: flex; gap: 0.75rem; align-items: center; }
+        .search-box { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 0.65rem 1.25rem; border-radius: 30px; display: flex; align-items: center; gap: 0.6rem; }
+        .search-box input { background: transparent; border: none; color: #fff; outline: none; font-family: inherit; font-size: 0.9rem; width: 180px; }
+        .notif-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; position: relative; transition: background 0.2s; }
+        .notif-btn:hover { background: rgba(255,255,255,0.1); }
+        .notif-btn span { position: absolute; top: -3px; right: -3px; width: 16px; height: 16px; background: #ef4444; border-radius: 50%; font-size: 0.6rem; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+        /* Tabs */
+        .tab-content { display: none; animation: slideUp 0.45s cubic-bezier(0.16,1,0.3,1); }
+        .tab-content.active-tab { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Grid */
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+        /* Stat Cards */
+        .stat-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .stat-card h2 { margin: 0; font-size: 2rem; }
+        .stat-card p { margin: 0 0 0.25rem; font-size: 0.85rem; color: var(--text-muted); }
+        .stat-card .trend { font-size: 0.78rem; color: #10b981; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem; }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; flex-shrink: 0; }
+
+        /* Art Cards */
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+        .art-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+        .art-card:hover { transform: translateY(-5px); border-color: var(--accent-violet); box-shadow: 0 12px 40px rgba(124,58,237,0.15); }
+        .art-card-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .art-card-body { padding: 1rem 1.25rem; }
+        .art-card-body h5 { margin: 0 0 0.2rem; font-size: 1rem; }
+        .art-card-body .artist { margin: 0 0 0.75rem; font-size: 0.82rem; color: var(--text-muted); }
+        .art-card-body .price { font-size: 0.95rem; font-weight: 700; color: var(--accent-violet); }
+        .art-card-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+        .btn-sm { padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary-sm { background: var(--gradient-violet); color: #fff; }
+        .btn-outline-sm { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); }
+        .btn-outline-sm:hover { background: rgba(255,255,255,0.1); }
+        .btn-danger-sm { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+        /* List Group */
+        .list-group { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: rgba(255,255,255,0.03); }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+        .badge-success { background: rgba(16,185,129,0.15); color: #10b981; }
+        .badge-pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .badge-processing { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+        /* Section Header */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .section-header h3 { margin: 0; font-size: 1.1rem; }
+        .section-header a { color: var(--accent-violet); font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+        .section-header a:hover { text-decoration: underline; }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(0,229,255,0.1) 100%);
+            border: 1px solid rgba(124,58,237,0.25); border-radius: 20px; padding: 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem; position: relative; overflow: hidden;
         }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.05); color: var(--text-main); }
-        .sidebar-menu a.active { border-left: 3px solid var(--accent-1); }
-        .sidebar-footer { padding: 2rem; border-top: 1px solid var(--glass-border); }
-        .sidebar-profile { display: flex; align-items: center; gap: 1rem; }
-        .sidebar-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .main-content { flex: 1; margin-left: 280px; padding: 2rem 3rem; display: flex; flex-direction: column; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
-        .stat-card {
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg); padding: 2rem; display: flex; justify-content: space-between; align-items: center;
-            transition: transform 0.3s;
+        .welcome-banner::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.15), transparent); }
+        .welcome-banner h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+        .welcome-banner p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+        .welcome-emoji { font-size: 4rem; }
+
+        /* Activity Timeline */
+        .timeline { position: relative; }
+        .timeline-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; position: relative; }
+        .timeline-item:not(:last-child)::after { content: ''; position: absolute; left: 20px; top: 44px; bottom: -1rem; width: 2px; background: rgba(255,255,255,0.05); }
+        .timeline-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .timeline-body { flex: 1; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem 1.25rem; }
+        .timeline-body h6 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+        .timeline-body p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+        .timeline-body .time { margin-top: 0.4rem; font-size: 0.78rem; color: var(--text-muted); }
+
+        /* Recommended Row */
+        .recommend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; }
+
+        /* Profile */
+        .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; }
+        .profile-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; text-align: center; }
+        .profile-card img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(124,58,237,0.4); margin: 0 auto 1rem; display: block; }
+        .profile-card h4 { margin: 0 0 0.25rem; }
+        .profile-card p { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+        .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.5rem; }
+        .profile-stat { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 0.75rem; text-align: center; }
+        .profile-stat h5 { margin: 0 0 0.2rem; font-size: 1.2rem; }
+        .profile-stat p { margin: 0; font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Settings */
+        .settings-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+        .settings-card h4 { margin: 0 0 1.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .settings-card h4 i { color: var(--accent-violet); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); color: #fff; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; box-sizing: border-box; }
+        .form-input:focus { outline: none; border-color: var(--accent-violet); }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-row h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .toggle-row p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+        .toggle { position: relative; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 30px; cursor: pointer; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider { background: var(--accent-violet); }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; left: 3px; top: 3px; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* Notification Items */
+        .notif-item { display: flex; gap: 1rem; padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: rgba(255,255,255,0.03); }
+        .notif-item.unread { background: rgba(124,58,237,0.04); }
+        .notif-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+        .notif-body h6 { margin: 0 0 0.25rem; font-size: 0.9rem; }
+        .notif-body p { margin: 0 0 0.25rem; font-size: 0.85rem; color: var(--text-secondary, #aaa); line-height: 1.5; }
+        .notif-body .time { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Footer */
+        footer { margin-top: auto; padding-top: 3rem; }
+        footer div { border-top: 1px solid var(--glass-border); padding: 1.5rem 0; text-align: center; color: var(--text-muted); font-size: 0.82rem; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .profile-layout { grid-template-columns: 1fr; }
         }
-        .stat-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
-        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
-        .purchased-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-        .purchased-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-md); overflow: hidden; transition: transform 0.3s; }
-        .purchased-card:hover { transform: translateY(-5px); }
-        .purchased-card img { width: 100%; height: 150px; object-fit: cover; }
+        @media (max-width: 1024px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .sidebar { transform: translateX(-100%); width: 280px !important; }
+            .sidebar.open { transform: translateX(0); }
+            .toggle-desktop-sidebar { display: none; }
+            .sidebar.collapsed .sidebar-logo span, .sidebar.collapsed .sidebar-user-card div, .sidebar.collapsed .sidebar-menu a span, .sidebar.collapsed .sidebar-section-title, .sidebar.collapsed .alert-dot { display: inline-block; }
+            .sidebar.collapsed .sidebar-menu a { justify-content: flex-start; padding: 0.75rem 1rem; }
+            .sidebar.collapsed .sidebar-header { justify-content: space-between; padding: 1.25rem 1.5rem; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 5.5rem 1.25rem 2rem !important; }
+            body.sidebar-collapsed .main-content { margin-left: 0 !important; width: 100% !important; }
+            .mobile-header { display: flex !important; }
+            .close-sidebar { display: block; }
+            .search-box input { width: 130px; }
+        }
+        @media (max-width: 640px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .welcome-banner { flex-direction: column; text-align: center; gap: 1rem; }
+            .header-actions { width: 100%; }
+        }
     </style>
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
-        <div id="premium-loader">
-        <canvas id="loader-canvas"></canvas>
-        <div class="loader-noise"></div>
-        <div class="loader-mesh"></div>
-        <div class="loader-content">
-            <div class="loader-logo-container">
-                <div class="loader-ring"></div>
-                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
-            </div>
-            <div class="loader-text-container">
-                <span id="loader-text"></span><span class="loader-cursor"></span>
-            </div>
-        </div>
-        <div class="loader-progress-container">
-            <div class="loader-progress-bar" id="loader-progress">
-                <div class="loader-shimmer"></div>
-            </div>
-        </div>
+    <!-- Mobile Top Bar -->
+    <div class="mobile-header">
+        <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+        <button class="hamburger" id="open-sidebar" aria-label="Menu" style="display:flex; z-index:1001;"><span></span><span></span><span></span></button>
     </div>
 
     <div class="dashboard-layout">
-        <!-- User Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-menu">
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 1rem 0 0.5rem 1.5rem; color: var(--text-muted);">Menu</p>
-                <a href="#dashboard" class="active"><i class="uil uil-apps"></i> Dashboard</a>
-                <a href="marketplace.html"><i class="uil uil-store"></i> Marketplace</a>
-                <a href="#purchased"><i class="uil uil-shopping-bag"></i> Purchased Artworks</a>
-                <a href="#collection"><i class="uil uil-layer-group"></i> My Collection</a>
-                <a href="#wishlist"><i class="uil uil-heart"></i> Wishlist</a>
-                <a href="#downloads"><i class="uil uil-cloud-download"></i> Downloads</a>
-                <a href="#orders"><i class="uil uil-receipt"></i> Orders</a>
-                
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 2rem 0 0.5rem 1.5rem; color: var(--text-muted);">Account</p>
-                <a href="#messages"><i class="uil uil-envelope"></i> Messages</a>
-                <a href="#notifications"><i class="uil uil-bell"></i> Notifications</a>
-                <a href="#profile"><i class="uil uil-user"></i> Profile</a>
-                <a href="#settings"><i class="uil uil-setting"></i> Settings</a>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <aside class="sidebar" id="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+                <button class="toggle-desktop-sidebar" id="toggle-desktop-sidebar"><i class="uil uil-left-arrow-to-left"></i></button>
+                <button class="close-sidebar" id="close-sidebar"><i class="uil uil-times"></i></button>
             </div>
-            <div class="sidebar-footer">
-                <div class="sidebar-profile">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="User">
-                    <div style="flex: 1;"><h5 style="margin: 0; font-size: 0.95rem;">Jane Doe</h5><p style="margin: 0; font-size: 0.8rem;">Collector</p></div>
-                    <a href="index.html" style="color: var(--accent-3);"><i class="uil uil-sign-out-alt"></i></a>
+            <div class="sidebar-user-card">
+                <img loading="lazy" src="IMAGE/lena cover.webp" alt="User">
+                <div>
+                    <h6>Jane Doe</h6>
+                    <p>Collector • Premium</p>
                 </div>
+            </div>
+            <div class="sidebar-menu">
+                <p class="sidebar-section-title">Main</p>
+                <a href="#dashboard" class="dash-link active"><i class="uil uil-apps"></i> <span>Overview</span></a>
+                                <a href="#activity" class="dash-link"><i class="uil uil-history"></i> <span>Activity Feed</span></a>
+                <a href="#analytics" class="dash-link"><i class="uil uil-chart-line"></i> <span>Analytics</span></a>
+                <a href="#favorites" class="dash-link"><i class="uil uil-heart-alt"></i> <span>Favorites</span></a>
+                <a href="#recommended" class="dash-link"><i class="uil uil-star"></i> <span>Recommended</span></a>
+
+                <p class="sidebar-section-title">Collection</p>
+                <a href="#purchased" class="dash-link"><i class="uil uil-shopping-bag"></i> <span>Purchased Artworks</span></a>
+                <a href="#wishlist" class="dash-link"><i class="uil uil-heart"></i> <span>Wishlist</span></a>
+                <a href="#orders" class="dash-link"><i class="uil uil-receipt"></i> <span>Order History</span></a>
+                <a href="#collections" class="dash-link"><i class="uil uil-layer-group"></i> <span>Collections</span></a>
+                <a href="#following" class="dash-link"><i class="uil uil-user-check"></i> <span>Following Artists</span></a>
+
+                <p class="sidebar-section-title">Account</p>
+                <a href="#wallet" class="dash-link"><i class="uil uil-wallet"></i> <span>Wallet</span></a>
+                <a href="#messages" class="dash-link"><i class="uil uil-envelope"></i> <span>Messages</span></a>
+                <a href="#notifications" class="dash-link"><i class="uil uil-bell"></i> <span>Notifications</span> <span class="alert-dot">3</span></a>
+                <a href="#settings" class="dash-link"><i class="uil uil-setting"></i> <span>Settings</span></a>
+                <a href="login.html" class="logout-link dash-link"><i class="uil uil-sign-out-alt"></i> <span>Logout</span></a>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header class="dashboard-header reveal" style="position: relative;">
-                <div><h2 style="margin: 0;">User Dashboard</h2><p style="margin: 0; font-size: 0.9rem;">Welcome back, Jane! Here's your collection overview.</p></div>
-                <div style="position: absolute; left: 50%; transform: translateX(-50%);">
-                    <a href="index.html" class="logo"><img src="lo.webp" alt="Logo" style="height: 40px;"></a>
+            <header class="dashboard-header">
+                <div>
+                    <h2 id="page-title">Dashboard Overview</h2>
+                    <p id="page-subtitle">Welcome back, Jane! Here's your collection status.</p>
                 </div>
-                <div class="search-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 0.8rem 1.5rem; border-radius: var(--radius-full); display: flex; gap: 0.8rem; width: 300px;">
-                    <i class="uil uil-search" style="color: var(--text-muted);"></i>
-                    <input type="text" placeholder="Search..." style="background: transparent; border: none; color: white; outline: none; width: 100%;">
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="uil uil-search" style="color: var(--text-muted);"></i>
+                        <input type="text" placeholder="Search artworks...">
+                    </div>
+                    <button class="notif-btn"><i class="uil uil-bell"></i><span>3</span></button>
                 </div>
             </header>
 
+            <!-- 1. DASHBOARD OVERVIEW -->
             <div id="dashboard" class="tab-content active-tab">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div>
+                        <h2>Good afternoon, Jane! 👋</h2>
+                        <p>You have 3 new notifications and 1 item back in stock from your wishlist.</p>
+                        <div style="display:flex; gap:0.75rem; margin-top:1.25rem; flex-wrap:wrap;">
+                            <a href="#recommended" class="dash-link-trigger btn btn-primary" style="padding:0.6rem 1.25rem; border-radius:10px; text-decoration:none; font-size:0.85rem; font-weight:600; background: var(--gradient-violet); color:#fff; border:none; cursor:pointer;">Explore Art</a>
+                            <a href="#notifications" class="dash-link-trigger btn" style="padding:0.6rem 1.25rem; border-radius:10px; text-decoration:none; font-size:0.85rem; font-weight:600; background:rgba(255,255,255,0.06); color:#fff; border:1px solid var(--glass-border); cursor:pointer;">View Alerts</a>
+                        </div>
+                    </div>
+                    <div class="welcome-emoji" aria-hidden="true">🎨</div>
+                </div>
 
-            <div class="grid-3 reveal stagger-1">
-                <div class="stat-card tilt-card">
-                    <div class="tilt-card-inner">
-                        <p style="margin-bottom: 0.5rem;">Total Value</p><h2 style="margin: 0;">12.5 ETH</h2>
+                <!-- Stats -->
+                <div class="grid-4" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal">
+                        <div>
+                            <p>Portfolio Value</p>
+                            <h2>12.5 ETH</h2>
+                            <div class="trend"><i class="uil uil-arrow-up"></i> +8.4% this month</div>
+                        </div>
+                        <div class="stat-icon" style="background:rgba(124,58,237,0.15); color:var(--accent-violet);"><i class="uil uil-wallet"></i></div>
                     </div>
-                    <div class="stat-icon" style="background: rgba(109, 40, 217, 0.2); color: var(--accent-1);"><i class="uil uil-wallet"></i></div>
+                    <div class="stat-card reveal">
+                        <div>
+                            <p>Artworks Owned</p>
+                            <h2>45</h2>
+                            <div class="trend"><i class="uil uil-arrow-up"></i> +3 this month</div>
+                        </div>
+                        <div class="stat-icon" style="background:rgba(0,229,255,0.12); color:var(--accent-cyan);"><i class="uil uil-image"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div>
+                            <p>Wishlist Items</p>
+                            <h2>12</h2>
+                            <div class="trend" style="color:#f59e0b;"><i class="uil uil-clock"></i> 2 on sale now</div>
+                        </div>
+                        <div class="stat-icon" style="background:rgba(245,158,11,0.12); color:var(--accent-amber);"><i class="uil uil-heart"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div>
+                            <p>Total Spent</p>
+                            <h2>38.2 ETH</h2>
+                            <div class="trend"><i class="uil uil-arrow-up"></i> +2.1 ETH this month</div>
+                        </div>
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="uil uil-money-bill"></i></div>
+                    </div>
                 </div>
-                <div class="stat-card tilt-card">
-                    <div class="tilt-card-inner">
-                        <p style="margin-bottom: 0.5rem;">Artworks Owned</p><h2 style="margin: 0;">45</h2>
+
+                <!-- Recent Purchases + Activity side by side -->
+                <div class="grid-2" style="margin-bottom:2rem;">
+                    <div>
+                        <div class="section-header">
+                            <h3>Recently Purchased</h3>
+                            <a href="#purchased" class="dash-link-trigger">View All →</a>
+                        </div>
+                        <div class="list-group">
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/LENA.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Neon Genesis</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @marcus_v • Oct 12</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:var(--accent-violet);">0.8 ETH</p><span class="status-badge badge-success">Owned</span></div>
+                            </div>
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/liquid dreams.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Abstract Dimensions</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @sarah_art • Sep 28</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:var(--accent-violet);">1.2 ETH</p><span class="status-badge badge-success">Owned</span></div>
+                            </div>
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/marcus.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Cyberpunk City</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @neo_creator • Aug 05</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:var(--accent-violet);">2.5 ETH</p><span class="status-badge badge-success">Owned</span></div>
+                            </div>
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/mia cover.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Ethereal Spaces</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @aether • Jul 20</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:var(--accent-violet);">3.1 ETH</p><span class="status-badge badge-success">Owned</span></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-image"></i></div>
+
+                    <div>
+                        <div class="section-header">
+                            <h3>Wishlist Highlights</h3>
+                            <a href="#wishlist" class="dash-link-trigger">View All →</a>
+                        </div>
+                        <div class="list-group">
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/mia.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Digital Sunset</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @pixel_dreams</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:#f59e0b;">4.2 ETH</p><span class="status-badge badge-pending">Wanted</span></div>
+                            </div>
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/michael.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Void Protocol</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @void_art</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:#f59e0b;">7.5 ETH</p><span class="status-badge badge-pending">Wanted</span></div>
+                            </div>
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/mp.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Aurora Dreams</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @aurora_gen</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:#10b981;">2.8 ETH</p><span class="status-badge badge-success" style="background:rgba(16,185,129,0.1); color:#10b981;">On Sale!</span></div>
+                            </div>
+                            <div class="list-item reveal">
+                                <div style="display:flex; gap:1rem; align-items:center;">
+                                    <img loading="lazy" src="IMAGE/mp1.webp" alt="Art" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
+                                    <div>
+                                        <h6 style="margin:0 0 0.2rem; font-size:0.9rem;">Fractal Mind</h6>
+                                        <p style="margin:0; font-size:0.78rem; color:var(--text-muted);">By @fractal_fx</p>
+                                    </div>
+                                </div>
+                                <div style="text-align:right;"><p style="margin:0; font-weight:700; color:#f59e0b;">5.9 ETH</p><span class="status-badge badge-pending">Wanted</span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card tilt-card">
-                    <div class="tilt-card-inner">
-                        <p style="margin-bottom: 0.5rem;">Wishlist Items</p><h2 style="margin: 0;">12</h2>
+
+                <!-- Recommended Artworks -->
+                <div style="margin-bottom:2rem;">
+                    <div class="section-header">
+                        <h3>✨ Recommended For You</h3>
+                        <a href="#recommended" class="dash-link-trigger">See All →</a>
                     </div>
-                    <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-heart"></i></div>
+                    <div class="recommend-grid">
+                        <div class="art-card tilt-card reveal">
+                            <img loading="lazy" class="art-card-img" src="IMAGE/mp2.webp" alt="Art">
+                            <div class="art-card-body">
+                                <h5>Pixel Dreams</h5>
+                                <p class="artist">By @pixel_sage</p>
+                                <p class="price">3.5 ETH</p>
+                                <div class="art-card-actions">
+                                    <button class="btn-sm btn-primary-sm">Buy Now</button>
+                                    <button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="art-card tilt-card reveal">
+                            <img loading="lazy" class="art-card-img" src="IMAGE/mp3.webp" alt="Art">
+                            <div class="art-card-body">
+                                <h5>Solar Flare</h5>
+                                <p class="artist">By @cosmic_art</p>
+                                <p class="price">1.9 ETH</p>
+                                <div class="art-card-actions">
+                                    <button class="btn-sm btn-primary-sm">Buy Now</button>
+                                    <button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="art-card tilt-card reveal">
+                            <img loading="lazy" class="art-card-img" src="IMAGE/neon genesis.webp" alt="Art">
+                            <div class="art-card-body">
+                                <h5>Deep Ocean</h5>
+                                <p class="artist">By @oceanic_vis</p>
+                                <p class="price">6.0 ETH</p>
+                                <div class="art-card-actions">
+                                    <button class="btn-sm btn-primary-sm">Buy Now</button>
+                                    <button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="art-card tilt-card reveal">
+                            <img loading="lazy" class="art-card-img" src="IMAGE/neon metropolis.webp" alt="Art">
+                            <div class="art-card-body">
+                                <h5>Neon Roads</h5>
+                                <p class="artist">By @neon_pixel</p>
+                                <p class="price">2.2 ETH</p>
+                                <div class="art-card-actions">
+                                    <button class="btn-sm btn-primary-sm">Buy Now</button>
+                                    <button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="reveal stagger-2" style="margin-top: 3rem;">
-                <div class="grid-3 reveal stagger-1">
-                    <div class="stat-card tilt-card">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.5rem;">Total Value</p><h2 style="margin: 0;">12.5 ETH</h2>
+            <!-- 2. ACTIVITY FEED -->
+            <div id="activity" class="tab-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon" style="background:rgba(124,58,237,0.2); color:var(--accent-violet);"><i class="uil uil-shopping-cart"></i></div>
+                        <div class="timeline-body">
+                            <h6>Purchase Completed</h6>
+                            <p>You purchased <strong>"Neon Genesis"</strong> by @marcus_v for 0.8 ETH</p>
+                            <p class="time">Today, 2:14 PM</p>
                         </div>
-                        <div class="stat-icon" style="background: rgba(109, 40, 217, 0.2); color: var(--accent-1);"><i class="uil uil-wallet"></i></div>
                     </div>
-                    <div class="stat-card tilt-card">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.5rem;">Artworks Owned</p><h2 style="margin: 0;">45</h2>
+                    <div class="timeline-item">
+                        <div class="timeline-icon" style="background:rgba(245,158,11,0.2); color:#f59e0b;"><i class="uil uil-heart"></i></div>
+                        <div class="timeline-body">
+                            <h6>Added to Wishlist</h6>
+                            <p>You saved <strong>"Fractal Mind"</strong> by @fractal_fx to your wishlist</p>
+                            <p class="time">Yesterday, 5:30 PM</p>
                         </div>
-                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-image"></i></div>
                     </div>
-                    <div class="stat-card tilt-card">
-                        <div class="tilt-card-inner">
-                            <p style="margin-bottom: 0.5rem;">Wishlist Items</p><h2 style="margin: 0;">12</h2>
+                    <div class="timeline-item">
+                        <div class="timeline-icon" style="background:rgba(16,185,129,0.2); color:#10b981;"><i class="uil uil-star"></i></div>
+                        <div class="timeline-body">
+                            <h6>Artist Followed</h6>
+                            <p>You started following artist <strong>@aurora_gen</strong></p>
+                            <p class="time">Jun 27, 10:00 AM</p>
                         </div>
-                        <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-heart"></i></div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon" style="background:rgba(0,229,255,0.2); color:var(--accent-cyan);"><i class="uil uil-eye"></i></div>
+                        <div class="timeline-body">
+                            <h6>Artwork Viewed</h6>
+                            <p>You viewed <strong>"Void Protocol"</strong> by @void_art (25 min session)</p>
+                            <p class="time">Jun 26, 8:45 PM</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon" style="background:rgba(124,58,237,0.2); color:var(--accent-violet);"><i class="uil uil-shopping-cart"></i></div>
+                        <div class="timeline-body">
+                            <h6>Purchase Completed</h6>
+                            <p>You purchased <strong>"Abstract Dimensions"</strong> by @sarah_art for 1.2 ETH</p>
+                            <p class="time">Jun 25, 3:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon" style="background:rgba(239,68,68,0.2); color:#ef4444;"><i class="uil uil-bell"></i></div>
+                        <div class="timeline-body">
+                            <h6>Price Alert</h6>
+                            <p><strong>"Aurora Dreams"</strong> is now on sale! Price dropped from 3.8 ETH to 2.8 ETH</p>
+                            <p class="time">Jun 24, 11:20 AM</p>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="reveal stagger-2" style="margin-top: 3rem;">
-                    <h3 style="margin-bottom: 1.5rem;">Purchased Artworks</h3>
-                    <div class="purchased-grid">
-                        <div class="purchased-card"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Art"><div style="padding: 1rem;"><h5 style="margin-bottom: 0.2rem;">Neon Genesis</h5><p style="margin: 0; font-size: 0.8rem;">0.8 ETH</p></div></div>
-                        <div class="purchased-card"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Art"><div style="padding: 1rem;"><h5 style="margin-bottom: 0.2rem;">Abstract Dimensions</h5><p style="margin: 0; font-size: 0.8rem;">1.2 ETH</p></div></div>
+                        <!-- ANALYTICS -->
+            <div id="analytics" class="tab-content">
+                <div class="section-header">
+                    <h3>Portfolio Analytics</h3>
+                </div>
+                <div class="grid-2">
+                    <div class="stat-card reveal" style="flex-direction:column; align-items:stretch;">
+                        <h4 style="margin:0 0 1rem;">Revenue Graph</h4>
+                        <div class="css-chart">
+                            <div class="chart-bar" style="height:40%; animation-delay:0.1s;"></div>
+                            <div class="chart-bar" style="height:60%; animation-delay:0.2s;"></div>
+                            <div class="chart-bar" style="height:30%; animation-delay:0.3s;"></div>
+                            <div class="chart-bar" style="height:80%; animation-delay:0.4s;"></div>
+                            <div class="chart-bar" style="height:50%; animation-delay:0.5s;"></div>
+                            <div class="chart-bar" style="height:90%; animation-delay:0.6s;"></div>
+                            <div class="chart-bar" style="height:100%; animation-delay:0.7s;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:0.5rem; color:var(--text-muted); font-size:0.8rem;">
+                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                        </div>
+                    </div>
+                    <div class="stat-card reveal" style="flex-direction:column; align-items:stretch;">
+                        <h4 style="margin:0 0 1rem;">Profile Views</h4>
+                        <div style="display:flex; justify-content:center; align-items:center; height:150px;">
+                            <div style="width:120px; height:120px; border-radius:50%; background:conic-gradient(var(--accent-violet) 75%, rgba(255,255,255,0.1) 0); display:flex; justify-content:center; align-items:center;">
+                                <div style="width:90px; height:90px; background:var(--bg-card); border-radius:50%; display:flex; justify-content:center; align-items:center;">
+                                    <h3 style="margin:0;"><span class="count-up" data-target="75">0</span>%</h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Other Tabs Placeholder -->
-            <div id="purchased" class="tab-content"><h2 style="margin-bottom: 2rem;">Purchased Artworks</h2><p style="color: var(--text-muted);">You have no purchased artworks yet. Start collecting!</p></div>
-            <div id="collection" class="tab-content"><h2 style="margin-bottom: 2rem;">My Collection</h2><p style="color: var(--text-muted);">Your custom curated collections will appear here.</p></div>
-            <div id="wishlist" class="tab-content"><h2 style="margin-bottom: 2rem;">Wishlist</h2><p style="color: var(--text-muted);">Items you save for later will appear here.</p></div>
-            <div id="downloads" class="tab-content"><h2 style="margin-bottom: 2rem;">Downloads</h2><p style="color: var(--text-muted);">Your downloadable high-res assets will appear here.</p></div>
-            <div id="orders" class="tab-content"><h2 style="margin-bottom: 2rem;">Orders</h2><p style="color: var(--text-muted);">Transaction history goes here.</p></div>
-            
-            <div id="messages" class="tab-content"><h2 style="margin-bottom: 2rem;">Messages</h2><p style="color: var(--text-muted);">No new messages.</p></div>
-            <div id="notifications" class="tab-content"><h2 style="margin-bottom: 2rem;">Notifications</h2><p style="color: var(--text-muted);">You're all caught up!</p></div>
-            <div id="profile" class="tab-content"><h2 style="margin-bottom: 2rem;">Profile</h2><p style="color: var(--text-muted);">Profile settings go here.</p></div>
-            <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">Settings</h2><p style="color: var(--text-muted);">Account preferences go here.</p></div>
+            <!-- FAVORITES -->
+            <div id="favorites" class="tab-content">
+                <div class="section-header">
+                    <h3>Your Favorites</h3>
+                </div>
+                <div class="art-grid">
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/michael.webp" alt="Art"><div class="art-card-body"><h5>Void Protocol</h5><p class="price">7.5 ETH</p><button class="btn-sm btn-primary-sm" style="width:100%; margin-top:0.5rem;">Buy Now</button></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/mp.webp" alt="Art"><div class="art-card-body"><h5>Aurora Dreams</h5><p class="price">2.8 ETH</p><button class="btn-sm btn-primary-sm" style="width:100%; margin-top:0.5rem;">Buy Now</button></div></div>
+                </div>
+            </div>
 
-            <!-- Footer -->
-    <footer style="margin-top: 4rem;">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
-                        <img src="lo.webp" alt="Stackly Logo">
-                    </a>
-                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
-                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+            <!-- 3. RECOMMENDED -->
+            <div id="recommended" class="tab-content">
+                <div style="margin-bottom:1.5rem; background:var(--bg-card); border:1px solid var(--glass-border); border-radius:16px; padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                    <div>
+                        <h4 style="margin:0 0 0.25rem;">Curated For You</h4>
+                        <p style="margin:0; color:var(--text-muted); font-size:0.85rem;">Based on your collection history and preferences</p>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button class="btn-sm btn-primary-sm">All</button>
+                        <button class="btn-sm btn-outline-sm">Abstract</button>
+                        <button class="btn-sm btn-outline-sm">Cyber</button>
+                        <button class="btn-sm btn-outline-sm">Nature</button>
+                        <button class="btn-sm btn-outline-sm">Portraits</button>
                     </div>
                 </div>
-                <div class="footer-col">
-                    <h4>Marketplace</h4>
-                    <ul class="footer-links">
-                        <li><a href="404.html">All Artworks</a></li>
-                        <li><a href="404.html">New Releases</a></li>
-                        <li><a href="404.html">Top Artists</a></li>
-                        <li><a href="404.html">Collections</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>My Account</h4>
-                    <ul class="footer-links">
-                        <li><a href="login.html">Profile</a></li>
-                        <li><a href="404.html">Favorites</a></li>
-                        <li><a href="404.html">My Collections</a></li>
-                        <li><a href="404.html">Settings</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="404.html">Careers</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="404.html">Privacy Policy</a></li>
-                    </ul>
+                <div class="art-grid">
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/ocean deapth.webp" alt="Art"><div class="art-card-body"><h5>Pixel Dreams</h5><p class="artist">By @pixel_sage</p><p class="price">3.5 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/oscar cover.webp" alt="Art"><div class="art-card-body"><h5>Solar Flare</h5><p class="artist">By @cosmic_art</p><p class="price">1.9 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/oscar.webp" alt="Art"><div class="art-card-body"><h5>Deep Ocean</h5><p class="artist">By @oceanic_vis</p><p class="price">6.0 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/pixel horizon.webp" alt="Art"><div class="art-card-body"><h5>Neon Roads</h5><p class="artist">By @neon_pixel</p><p class="price">2.2 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/priya.webp" alt="Art"><div class="art-card-body"><h5>Light Spectrum</h5><p class="artist">By @spectrum_lab</p><p class="price">4.4 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/quantum fields.webp" alt="Art"><div class="art-card-body"><h5>Dark Matter</h5><p class="artist">By @darkwave_art</p><p class="price">8.1 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-outline-sm"><i class="uil uil-heart"></i></button></div></div></div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Stackly. All rights reserved.</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <a href="404.html">Terms</a>
-                    <a href="404.html">Privacy</a>
+
+            <!-- 4. PURCHASED ARTWORKS -->
+            <div id="purchased" class="tab-content">
+                <div class="art-grid">
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/quantum fragments.webp" alt="Art"><div class="art-card-body"><h5>Neon Genesis</h5><p class="artist">By @marcus_v • Oct 12, 2025</p><p class="price" style="color:#10b981;">Owned</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">View</button><button class="btn-sm btn-outline-sm">Download</button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/retro furture.webp" alt="Art"><div class="art-card-body"><h5>Abstract Dimensions</h5><p class="artist">By @sarah_art • Sep 28, 2025</p><p class="price" style="color:#10b981;">Owned</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">View</button><button class="btn-sm btn-outline-sm">Download</button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/ryu.webp" alt="Art"><div class="art-card-body"><h5>Cyberpunk City</h5><p class="artist">By @neo_creator • Aug 5, 2025</p><p class="price" style="color:#10b981;">Owned</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">View</button><button class="btn-sm btn-outline-sm">Download</button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/sarah jankins.webp" alt="Art"><div class="art-card-body"><h5>Ethereal Spaces</h5><p class="artist">By @aether • Jul 20, 2025</p><p class="price" style="color:#10b981;">Owned</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">View</button><button class="btn-sm btn-outline-sm">Download</button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/sophie cover.webp" alt="Art"><div class="art-card-body"><h5>Aurora Borealis</h5><p class="artist">By @aurora_gen • Jun 1, 2025</p><p class="price" style="color:#10b981;">Owned</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">View</button><button class="btn-sm btn-outline-sm">Download</button></div></div></div>
                 </div>
             </div>
-        </div>
-    </footer>
+
+            <!-- 5. WISHLIST -->
+            <div id="wishlist" class="tab-content">
+                <div class="art-grid">
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/sophie.webp" alt="Art"><div class="art-card-body"><h5>Digital Sunset</h5><p class="artist">By @pixel_dreams</p><p class="price">4.2 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/theo cover.webp" alt="Art"><div class="art-card-body"><h5>Void Protocol</h5><p class="artist">By @void_art</p><p class="price">7.5 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal" style="border-color:#10b981;"><img loading="lazy" class="art-card-img" src="IMAGE/theo.webp" alt="Art"><div class="art-card-body"><h5>Aurora Dreams <span style="background:rgba(16,185,129,0.2);color:#10b981;font-size:0.7rem;padding:2px 8px;border-radius:10px;margin-left:0.5rem;">Sale!</span></h5><p class="artist">By @aurora_gen</p><p class="price">2.8 ETH <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.8rem; font-weight:400;">3.8 ETH</span></p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/zara cover.webp" alt="Art"><div class="art-card-body"><h5>Fractal Mind</h5><p class="artist">By @fractal_fx</p><p class="price">5.9 ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Buy Now</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                </div>
+            </div>
+
+            <!-- 6. ORDER HISTORY -->
+            <div id="orders" class="tab-content">
+                <div class="list-group">
+                    <div class="list-item reveal">
+                        <div><h6 style="margin:0 0 0.2rem;">Order #ORD-8472</h6><p style="margin:0; font-size:0.82rem; color:var(--text-muted);">Oct 12, 2025 • Neon Genesis</p></div>
+                        <div style="text-align:right;"><p style="margin:0 0 0.3rem; font-weight:700;">0.8 ETH</p><span class="status-badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="list-item reveal">
+                        <div><h6 style="margin:0 0 0.2rem;">Order #ORD-7391</h6><p style="margin:0; font-size:0.82rem; color:var(--text-muted);">Sep 28, 2025 • Abstract Dimensions</p></div>
+                        <div style="text-align:right;"><p style="margin:0 0 0.3rem; font-weight:700;">1.2 ETH</p><span class="status-badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="list-item reveal">
+                        <div><h6 style="margin:0 0 0.2rem;">Order #ORD-6120</h6><p style="margin:0; font-size:0.82rem; color:var(--text-muted);">Aug 5, 2025 • Cyberpunk City</p></div>
+                        <div style="text-align:right;"><p style="margin:0 0 0.3rem; font-weight:700;">2.5 ETH</p><span class="status-badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="list-item reveal">
+                        <div><h6 style="margin:0 0 0.2rem;">Order #ORD-5891</h6><p style="margin:0; font-size:0.82rem; color:var(--text-muted);">Jul 20, 2025 • Ethereal Spaces</p></div>
+                        <div style="text-align:right;"><p style="margin:0 0 0.3rem; font-weight:700;">3.1 ETH</p><span class="status-badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="list-item reveal">
+                        <div><h6 style="margin:0 0 0.2rem;">Order #ORD-4234</h6><p style="margin:0; font-size:0.82rem; color:var(--text-muted);">Jun 1, 2025 • Aurora Borealis</p></div>
+                        <div style="text-align:right;"><p style="margin:0 0 0.3rem; font-weight:700;">4.9 ETH</p><span class="status-badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="list-item reveal">
+                        <div><h6 style="margin:0 0 0.2rem;">Order #ORD-3102</h6><p style="margin:0; font-size:0.82rem; color:var(--text-muted);">May 14, 2025 • Ocean Pulse</p></div>
+                        <div style="text-align:right;"><p style="margin:0 0 0.3rem; font-weight:700;">1.7 ETH</p><span class="status-badge badge-processing">Refunded</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. NOTIFICATIONS -->
+            <div id="notifications" class="tab-content">
+                <div class="list-group">
+                    <div class="notif-item unread">
+                        <div class="notif-icon" style="background:rgba(124,58,237,0.2); color:var(--accent-violet);"><i class="uil uil-megaphone"></i></div>
+                        <div class="notif-body"><h6>New Collection Drop</h6><p>Artist @marcus_v just dropped a new 10-piece collection "Neon Futures". Be the first to grab a piece!</p><p class="time">2 hours ago</p></div>
+                    </div>
+                    <div class="notif-item unread">
+                        <div class="notif-icon" style="background:rgba(16,185,129,0.2); color:#10b981;"><i class="uil uil-tag-alt"></i></div>
+                        <div class="notif-body"><h6>Price Drop Alert</h6><p>"Aurora Dreams" on your wishlist has dropped from 3.8 ETH → 2.8 ETH. Buy now before it's gone!</p><p class="time">5 hours ago</p></div>
+                    </div>
+                    <div class="notif-item unread">
+                        <div class="notif-icon" style="background:rgba(245,158,11,0.2); color:#f59e0b;"><i class="uil uil-star"></i></div>
+                        <div class="notif-body"><h6>Artist Milestone</h6><p>@sarah_art, one of your followed artists, just hit 10,000 followers! Check out their latest works.</p><p class="time">Yesterday</p></div>
+                    </div>
+                    <div class="notif-item">
+                        <div class="notif-icon" style="background:rgba(16,185,129,0.2); color:#10b981;"><i class="uil uil-check-circle"></i></div>
+                        <div class="notif-body"><h6>Purchase Successful</h6><p>Your payment of 0.8 ETH for "Neon Genesis" was confirmed. Certificate of ownership issued.</p><p class="time">Oct 12, 2025</p></div>
+                    </div>
+                    <div class="notif-item">
+                        <div class="notif-icon" style="background:rgba(0,229,255,0.2); color:var(--accent-cyan);"><i class="uil uil-shield-check"></i></div>
+                        <div class="notif-body"><h6>Account Verified</h6><p>Your Stackly account has been fully verified. You now have access to all collector privileges.</p><p class="time">Sep 1, 2025</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. MY PROFILE -->
+            <div id="profile" class="tab-content">
+                <div class="profile-layout">
+                    <div>
+                        <div class="profile-card reveal">
+                            <img loading="lazy" src="IMAGE/zara.webp" alt="Profile">
+                            <h4>Jane Doe</h4>
+                            <p style="color:var(--accent-violet); margin-top:0.25rem;">@janedoe</p>
+                            <p style="margin-top:0.75rem; font-size:0.85rem; color:var(--text-muted); line-height:1.6;">Digital art collector and enthusiast based in New York. Passionate about NFTs and emerging digital artists.</p>
+                            <button class="btn-sm btn-outline-sm" style="width:100%; margin-top:1.25rem; padding:0.6rem;">Change Avatar</button>
+                            <div class="profile-stats">
+                                <div class="profile-stat"><h5>45</h5><p>Collected</p></div>
+                                <div class="profile-stat"><h5>12</h5><p>Wishlist</p></div>
+                                <div class="profile-stat"><h5>8</h5><p>Artists Followed</p></div>
+                                <div class="profile-stat"><h5>38.2</h5><p>ETH Spent</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-card reveal" style="margin-bottom:0;">
+                        <h4><i class="uil uil-user-circle"></i> Edit Profile</h4>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.25rem;">
+                            <div class="form-group" style="margin-bottom:0;"><label class="form-label">First Name</label><input type="text" class="form-input" value="Jane"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Last Name</label><input type="text" class="form-input" value="Doe"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-input" value="@janedoe"></div>
+                        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" value="jane@example.com"></div>
+                        <div class="form-group"><label class="form-label">Bio</label><textarea class="form-input" rows="3" style="resize:none;">Digital art collector and enthusiast based in New York.</textarea></div>
+                        <div class="form-group"><label class="form-label">Website</label><input type="url" class="form-input" value="https://janedoe.com"></div>
+                        <div class="form-group"><label class="form-label">Twitter / X</label><input type="text" class="form-input" value="@janedoe_nft"></div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.75rem 2rem; font-size:0.9rem;">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. SETTINGS -->
+            <div id="settings" class="tab-content">
+                <div style="max-width:700px;">
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-lock-alt"></i> Account & Security</h4>
+                        <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" value="jane@example.com"></div>
+                        <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" placeholder="••••••••"></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" placeholder="••••••••"></div>
+                            <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input" placeholder="••••••••"></div>
+                        </div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.7rem 1.5rem; font-size:0.88rem;">Update Password</button>
+                    </div>
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-bell"></i> Notifications</h4>
+                        <div class="toggle-row">
+                            <div><h6>New Artwork Alerts</h6><p>Get notified when followed artists drop new work</p></div>
+                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div><h6>Price Drop Alerts</h6><p>Wishlist items on sale</p></div>
+                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div><h6>Order Updates</h6><p>Confirmation and delivery notifications</p></div>
+                            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div><h6>Newsletter</h6><p>Weekly digest of trending art</p></div>
+                            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                        </div>
+                    </div>
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-wallet"></i> Payment & Wallet</h4>
+                        <div class="form-group"><label class="form-label">Wallet Address (ETH)</label><input type="text" class="form-input" value="0x1aB3c...d94F2"></div>
+                        <div class="form-group"><label class="form-label">Default Currency</label>
+                            <select class="form-input"><option>ETH — Ethereum</option><option>MATIC — Polygon</option><option>SOL — Solana</option></select>
+                        </div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.7rem 1.5rem; font-size:0.88rem;">Save Wallet Settings</button>
+                    </div>
+                    <div class="settings-card reveal" style="border-color:rgba(239,68,68,0.2);">
+                        <h4 style="color:#ef4444;"><i class="uil uil-trash-alt"></i> Danger Zone</h4>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">These actions are irreversible. Please proceed with caution.</p>
+                        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                            <button class="btn-sm btn-outline-sm">Deactivate Account</button>
+                            <button class="btn-sm btn-danger-sm">Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLLECTIONS (Placeholder) -->
+            <div id="collections" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-layer-group" style="font-size:3rem; color:var(--accent-cyan); display:block; margin-bottom:1rem;"></i>
+                    <h4>Your Collections</h4>
+                    <p>Coming soon: Organize your purchased artworks into custom collections.</p>
+                </div>
+            </div>
+
+            <!-- FOLLOWING (Placeholder) -->
+            <div id="following" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-user-check" style="font-size:3rem; color:var(--accent-cyan); display:block; margin-bottom:1rem;"></i>
+                    <h4>Following Artists</h4>
+                    <p>Coming soon: Keep track of your favorite creators.</p>
+                </div>
+            </div>
+
+            <!-- WALLET (Placeholder) -->
+            <div id="wallet" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-wallet" style="font-size:3rem; color:#10b981; display:block; margin-bottom:1rem;"></i>
+                    <h4>Crypto Wallet</h4>
+                    <p>Coming soon: View balances, deposit, and withdraw funds.</p>
+                </div>
+            </div>
+
+            <!-- MESSAGES (Placeholder) -->
+            <div id="messages" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-envelope" style="font-size:3rem; color:var(--accent-cyan); display:block; margin-bottom:1rem;"></i>
+                    <h4>Messages</h4>
+                    <p>Coming soon: Connect directly with artists and other collectors.</p>
+                </div>
+            </div>
+
+            <footer>
+                <div>&copy; 2026 Stackly. All rights reserved.</div>
+            </footer>
         </main>
     </div>
 
-    <script src="js/main.js?v=2"></script>
+    <script src="js/main.js"></script>
+    <script src="js/dashboards.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+

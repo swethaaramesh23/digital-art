@@ -7,221 +7,696 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        body { background-color: var(--bg-darker); }
-        .dashboard-layout { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 280px; background: rgba(20,20,25,0.8); backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
-            position: fixed; height: 100vh; z-index: 100;
+        * { box-sizing: border-box; }
+        html, body { margin: 0; background-color: var(--bg-darker, #050508); color: var(--text-main, #F8FAFC); font-family: var(--font-primary, 'Outfit', sans-serif); }
+        .dashboard-layout { display: block; width: 100%; min-height: 100vh; }
+
+        .mobile-header { display: none; padding: 1rem 1.5rem; background: rgba(12,12,18,0.97); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border,rgba(255,255,255,0.06)); position: fixed; top: 0; left: 0; right: 0; z-index: 1060; justify-content: space-between; align-items: center; }
+        .hamburger-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(5,5,8,0.85); z-index: 1045; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { opacity: 1; }
+
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-width, 280px); background: rgba(12,12,18,0.98); backdrop-filter: blur(24px); border-right: 1px solid var(--glass-border,rgba(255,255,255,0.06)); display: flex; flex-direction: column; z-index: 1050; transition: width 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.3s cubic-bezier(0.16,1,0.3,1); overflow: hidden; }
+        .sidebar.collapsed { width: var(--sidebar-mini-width, 80px); }
+        .sidebar.collapsed .sidebar-logo span, .sidebar.collapsed .sidebar-user-card > div, .sidebar.collapsed .sidebar-section-title, .sidebar.collapsed .alert-dot, .sidebar.collapsed .notif-dot { display: none !important; }
+        .sidebar.collapsed .sidebar-menu a { justify-content: center; padding: 0.85rem 0; gap: 0; }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 1.25rem 0.5rem; }
+        .sidebar.collapsed .sidebar-user-card { padding: 0.5rem; justify-content: center; background: transparent; border-color: transparent; }
+        .sidebar.collapsed .toggle-desktop-sidebar { margin: 0 auto; }
+
+        .sidebar-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border,rgba(255,255,255,0.06)); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-shrink: 0; min-height: 66px; }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; overflow: hidden; }
+        .sidebar-logo img { height: 28px; flex-shrink: 0; }
+        .sidebar-logo span { font-weight: 700; font-size: 1.05rem; color: #fff; white-space: nowrap; }
+        .close-sidebar { display: none; background: none; border: none; color: var(--text-muted,#64748B); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+        .toggle-desktop-sidebar { background: none; border: none; color: var(--text-muted,#64748B); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; transition: color 0.2s; flex-shrink: 0; }
+        .toggle-desktop-sidebar:hover { color: #fff; }
+
+        .sidebar-user-card { margin: 0.85rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(0,229,255,0.07); border: 1px solid rgba(0,229,255,0.18); display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; transition: all 0.3s; overflow: hidden; }
+        .sidebar-user-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,229,255,0.3); flex-shrink: 0; }
+        .sidebar-user-card h6 { margin: 0; font-size: 0.88rem; color: #fff; white-space: nowrap; }
+        .sidebar-user-card p { margin: 0; font-size: 0.73rem; color: var(--text-muted,#64748B); white-space: nowrap; }
+
+        .sidebar-menu { flex: 1; padding: 0.5rem 0.75rem 1rem; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-menu::-webkit-scrollbar { width: 3px; }
+        .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+        .sidebar-section-title { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted,#64748B); font-weight: 700; padding: 1rem 0.85rem 0.4rem; margin: 0; white-space: nowrap; overflow: hidden; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 0.85rem; padding: 0.72rem 0.9rem; color: var(--text-muted,#64748B); border-radius: 10px; margin-bottom: 0.1rem; font-weight: 500; font-size: 0.88rem; transition: all 0.2s; text-decoration: none; white-space: nowrap; overflow: hidden; }
+        .sidebar-menu a i { font-size: 1.15rem; width: 22px; text-align: center; flex-shrink: 0; transition: transform 0.2s, color 0.2s; }
+        .sidebar-menu a span { overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .sidebar-menu a:hover i { transform: scale(1.15) rotate(-8deg); }
+        .sidebar-menu a.active { background: rgba(0,229,255,0.1); color: #fff; border-left: 3px solid var(--accent-cyan,#00E5FF); padding-left: calc(0.9rem - 3px); box-shadow: inset 0 0 20px rgba(0,229,255,0.06); }
+        .sidebar-menu a.active i { color: var(--accent-cyan,#00E5FF); }
+        .sidebar-menu a.logout-link { color: #ef4444; }
+        .sidebar-menu a.logout-link:hover { background: rgba(239,68,68,0.1); }
+        .alert-dot, .notif-dot { margin-left: auto; background: #ef4444; color: #fff; border-radius: 20px; padding: 1px 7px; font-size: 0.67rem; font-weight: 700; flex-shrink: 0; }
+
+        .main-content { margin-left: var(--sidebar-width, 280px); width: calc(100% - var(--sidebar-width, 280px)); min-height: 100vh; padding: 2rem 2.5rem; box-sizing: border-box; transition: margin-left 0.3s cubic-bezier(0.16,1,0.3,1), width 0.3s cubic-bezier(0.16,1,0.3,1); }
+        body.sidebar-collapsed .main-content { margin-left: var(--sidebar-mini-width, 80px); width: calc(100% - var(--sidebar-mini-width, 80px)); }
+
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .dashboard-header h2 { margin: 0; font-size: 1.65rem; background: var(--gradient-cyan); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .dashboard-header p { margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--text-muted,#64748B); }
+        .header-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+        .tab-content { display: none; }
+        .tab-content.active-tab { display: block; animation: dashSlideUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes dashSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
+
+        .stat-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .stat-card h2 { margin: 0; font-size: 2rem; }
+        .stat-card p { margin: 0 0 0.2rem; font-size: 0.84rem; color: var(--text-muted,#64748B); }
+        .stat-card .trend { font-size: 0.77rem; color: #10b981; margin-top: 0.2rem; display: flex; align-items: center; gap: 0.25rem; }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; flex-shrink: 0; }
+
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1.5rem; }
+        .art-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+        .art-card:hover { transform: translateY(-5px); border-color: var(--accent-cyan,#00E5FF); box-shadow: 0 12px 40px rgba(0,229,255,0.1); }
+        .art-card-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .art-card-body { padding: 1rem 1.25rem; }
+        .art-card-body h5 { margin: 0 0 0.2rem; font-size: 1rem; }
+        .art-card-body .artist { margin: 0 0 0.5rem; font-size: 0.82rem; color: var(--text-muted,#64748B); }
+        .art-card-body .price { font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan,#00E5FF); }
+        .art-card-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+
+        .btn-sm { padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary-sm { background: var(--gradient-cyan); color: #000; }
+        .btn-outline-sm { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); }
+        .btn-danger-sm { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+        .list-group { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; overflow: hidden; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: rgba(255,255,255,0.03); }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .section-header h3 { margin: 0; font-size: 1.1rem; }
+        .section-header a { color: var(--accent-cyan,#00E5FF); font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.71rem; font-weight: 700; }
+        .badge-success { background: rgba(16,185,129,0.15); color: #10b981; }
+        .badge-pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .badge-processing { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .badge-reject { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        .chart-wrap { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 1.5rem; }
+        .chart-bars { display: flex; align-items: flex-end; gap: 0.5rem; height: 160px; padding-top: 1rem; }
+        .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+        .bar { width: 100%; border-radius: 6px 6px 0 0; background: var(--gradient-cyan); transition: height 1.2s cubic-bezier(0.4,0,0.2,1); min-height: 4px; }
+        .bar-label { font-size: 0.68rem; color: var(--text-muted,#64748B); }
+
+        .upload-area { border: 2px dashed var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 3.5rem 2rem; text-align: center; cursor: pointer; background: rgba(255,255,255,0.01); transition: all 0.3s; }
+        .upload-area:hover { border-color: var(--accent-cyan,#00E5FF); background: rgba(0,229,255,0.04); }
+        .upload-area i { font-size: 3.5rem; color: var(--accent-cyan,#00E5FF); margin-bottom: 1rem; display: block; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.4rem; color: var(--text-muted,#64748B); font-size: 0.84rem; font-weight: 500; }
+        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); background: rgba(255,255,255,0.03); color: #fff; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; box-sizing: border-box; }
+        .form-input:focus { outline: none; border-color: var(--accent-cyan,#00E5FF); }
+        .settings-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+        .settings-card h4 { margin: 0 0 1.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .settings-card h4 i { color: var(--accent-cyan,#00E5FF); }
+
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-row h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .toggle-row p { margin: 0; font-size: 0.8rem; color: var(--text-muted,#64748B); }
+        .toggle { position: relative; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 30px; cursor: pointer; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider { background: var(--accent-cyan,#00E5FF); }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #000; left: 3px; top: 3px; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        .follower-card { background: var(--bg-card,#151823); border: 1px solid var(--glass-border,rgba(255,255,255,0.06)); border-radius: 14px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; transition: all 0.2s; }
+        .follower-card:hover { border-color: var(--accent-cyan,#00E5FF); }
+        .follower-card img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+        .follower-card h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .follower-card p { margin: 0; font-size: 0.78rem; color: var(--text-muted,#64748B); }
+
+        .msg-item { display: flex; gap: 1rem; padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s; cursor: pointer; }
+        .msg-item:hover { background: rgba(255,255,255,0.03); }
+        .msg-item.unread { background: rgba(0,229,255,0.04); }
+        .msg-item img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .msg-item h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .msg-item p { margin: 0; font-size: 0.82rem; color: var(--text-muted,#64748B); }
+        .msg-item .time { font-size: 0.75rem; color: var(--text-muted,#64748B); white-space: nowrap; }
+
+        footer { margin-top: 3rem; }
+        footer div { border-top: 1px solid var(--glass-border,rgba(255,255,255,0.06)); padding: 1.5rem 0; text-align: center; color: var(--text-muted,#64748B); font-size: 0.82rem; }
+
+        @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 1024px) {
+            .mobile-header { display: flex !important; }
+            .sidebar { transform: translateX(-100%); width: 280px !important; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay { display: block; }
+            .toggle-desktop-sidebar { display: none; }
+            .close-sidebar { display: block !important; }
+            .sidebar.collapsed { width: 280px !important; }
+            .sidebar.collapsed .sidebar-logo span, .sidebar.collapsed .sidebar-user-card > div, .sidebar.collapsed .sidebar-section-title, .sidebar.collapsed .alert-dot, .sidebar.collapsed .notif-dot { display: block !important; }
+            .sidebar.collapsed .sidebar-menu a { justify-content: flex-start !important; padding: 0.72rem 0.9rem !important; gap: 0.85rem !important; }
+            .sidebar.collapsed .sidebar-header { justify-content: space-between !important; padding: 1.25rem 1.5rem !important; }
+            .sidebar.collapsed .sidebar-user-card { padding: 0.9rem 1rem !important; justify-content: flex-start !important; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 5.5rem 1.25rem 2rem !important; transition: none; }
+            body.sidebar-collapsed .main-content { margin-left: 0 !important; width: 100% !important; }
+            .grid-3 { grid-template-columns: repeat(2,1fr); }
         }
-        .sidebar-header { padding: 2rem; border-bottom: 1px solid var(--glass-border); }
-        .sidebar-menu { flex: 1; padding: 2rem 1rem; overflow-y: auto; }
-        .sidebar-menu::-webkit-scrollbar { width: 4px; }
-        .sidebar-menu a {
-            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
-            color: var(--text-muted); border-radius: var(--radius-sm); margin-bottom: 0.5rem; font-weight: 500;
-            transition: var(--transition-fast);
+        @media (max-width: 640px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+            .main-content { padding: 5rem 1rem 2rem !important; }
         }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.05); color: var(--text-main); }
-        .sidebar-menu a.active { border-left: 3px solid var(--accent-1); }
-        .sidebar-footer { padding: 2rem; border-top: 1px solid var(--glass-border); }
-        .sidebar-profile { display: flex; align-items: center; gap: 1rem; }
-        .sidebar-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .main-content { flex: 1; margin-left: 280px; padding: 2rem 3rem; display: flex; flex-direction: column; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
-        .stat-card {
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg); padding: 2rem; display: flex; justify-content: space-between; align-items: center;
-        }
-        .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
-        .chart-container { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2rem; }
-        .mock-chart { width: 100%; height: 250px; background: repeating-linear-gradient(0deg, transparent, transparent 49px, var(--glass-border) 50px); position: relative; margin-top: 1.5rem; display: flex; align-items: flex-end; justify-content: space-around; padding-top: 2rem; }
-        .bar { width: 8%; background: var(--gradient-primary); border-radius: 5px 5px 0 0; transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .activity-timeline { margin-top: 2rem; }
-        .activity-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .activity-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(109, 40, 217, 0.2); color: var(--accent-1); display: flex; justify-content: center; align-items: center; }
     </style>
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
-        <div id="premium-loader">
-        <canvas id="loader-canvas"></canvas>
-        <div class="loader-noise"></div>
-        <div class="loader-mesh"></div>
-        <div class="loader-content">
-            <div class="loader-logo-container">
-                <div class="loader-ring"></div>
-                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
-            </div>
-            <div class="loader-text-container">
-                <span id="loader-text"></span><span class="loader-cursor"></span>
-            </div>
-        </div>
-        <div class="loader-progress-container">
-            <div class="loader-progress-bar" id="loader-progress">
-                <div class="loader-shimmer"></div>
-            </div>
-        </div>
+    <div class="mobile-header">
+        <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+        <button class="hamburger" id="open-sidebar" aria-label="Menu" style="display:flex; z-index:1001;"><span></span><span></span><span></span></button>
+    </div>
+
+
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(5,5,8,0.8); z-index: 1040; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .sidebar { width: var(--sidebar-width, 280px); background: rgba(15,15,20,0.98); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 1050; transition: width 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.3s; }
+        .sidebar.collapsed { width: var(--sidebar-mini-width, 80px); }
+        .sidebar.collapsed .sidebar-logo span, .sidebar.collapsed .sidebar-user-card div, .sidebar.collapsed .sidebar-menu a span, .sidebar.collapsed .sidebar-section-title, .sidebar.collapsed .notif-dot { display: none; }
+        .sidebar.collapsed .sidebar-menu a { justify-content: center; padding: 0.75rem 0; }
+        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 1.25rem 0; }
+        .sidebar.collapsed .sidebar-user-card { padding: 0.5rem; justify-content: center; background: transparent; border-color: transparent; }
+        
+        .sidebar-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+        .sidebar-logo img { height: 26px; }
+        .sidebar-logo span { font-weight: 700; font-size: 1.05rem; color: #fff; white-space: nowrap; }
+        .close-sidebar { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; }
+        .toggle-desktop-sidebar { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .toggle-desktop-sidebar:hover { color: #fff; }
+
+        .sidebar-user-card { margin: 1rem; padding: 1rem; border-radius: 12px; background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); display: flex; align-items: center; gap: 0.85rem; flex-shrink: 0; transition: 0.3s; white-space: nowrap; overflow: hidden; }
+        .sidebar-user-card img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,229,255,0.3); }
+        .sidebar-user-card h6 { margin: 0; font-size: 0.9rem; color: #fff; }
+        .sidebar-user-card p { margin: 0; font-size: 0.75rem; color: var(--text-muted); }
+
+        .sidebar-menu { flex: 1; padding: 0.5rem 0.75rem 1rem; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-menu::-webkit-scrollbar { width: 3px; }
+        .sidebar-section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; padding: 1rem 0.75rem 0.4rem; margin: 0; white-space: nowrap; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1rem; color: var(--text-muted); border-radius: 10px; margin-bottom: 0.15rem; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; text-decoration: none; white-space: nowrap; }
+        .sidebar-menu a i { font-size: 1.1rem; width: 22px; text-align: center; transition: transform 0.2s; }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .sidebar-menu a:hover i { transform: rotate(-10deg) scale(1.1); }
+        .sidebar-menu a.active { background: rgba(0,229,255,0.12); color: #fff; border-left: 3px solid var(--accent-cyan); box-shadow: inset 2px 0 10px rgba(0,229,255,0.1); }
+        .sidebar-menu a.active i { color: var(--accent-cyan); }
+        .sidebar-menu a.logout-link { color: #ef4444; }
+        .sidebar-menu a.logout-link:hover { background: rgba(239,68,68,0.1); }
+        .notif-dot { margin-left: auto; background: var(--accent-cyan); color: #000; border-radius: 12px; padding: 1px 7px; font-size: 0.68rem; font-weight: 700; }
+
+        .main-content { margin-left: var(--sidebar-width, 280px); width: calc(100% - var(--sidebar-width, 280px)); padding: 2rem 2.5rem; min-height: 100vh; box-sizing: border-box; transition: margin-left 0.3s cubic-bezier(0.16,1,0.3,1), width 0.3s cubic-bezier(0.16,1,0.3,1); }
+        body.sidebar-collapsed .main-content { margin-left: var(--sidebar-mini-width, 80px); width: calc(100% - var(--sidebar-mini-width, 80px)); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .dashboard-header h2 { margin: 0; font-size: 1.7rem; background: var(--gradient-cyan); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .dashboard-header p { margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--text-muted); }
+        .header-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+        .tab-content { display: none; animation: slideUp 0.45s cubic-bezier(0.16,1,0.3,1); }
+        .tab-content.active-tab { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+        .stat-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .stat-card h2 { margin: 0; font-size: 2rem; }
+        .stat-card p { margin: 0 0 0.25rem; font-size: 0.85rem; color: var(--text-muted); }
+        .stat-card .trend { font-size: 0.78rem; color: #10b981; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem; }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; flex-shrink: 0; }
+
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+        .art-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+        .art-card:hover { transform: translateY(-5px); border-color: var(--accent-cyan); box-shadow: 0 12px 40px rgba(0,229,255,0.1); }
+        .art-card-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .art-card-body { padding: 1rem 1.25rem; }
+        .art-card-body h5 { margin: 0 0 0.2rem; font-size: 1rem; }
+        .art-card-body .artist { margin: 0 0 0.5rem; font-size: 0.82rem; color: var(--text-muted); }
+        .art-card-body .price { font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan); }
+        .art-card-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+
+        .btn-sm { padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary-sm { background: var(--gradient-cyan); color: #000; }
+        .btn-outline-sm { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); }
+        .btn-danger-sm { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+        .list-group { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: rgba(255,255,255,0.03); }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .section-header h3 { margin: 0; font-size: 1.1rem; }
+        .section-header a { color: var(--accent-cyan); font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+        .badge-success { background: rgba(16,185,129,0.15); color: #10b981; }
+        .badge-pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .badge-processing { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .badge-reject { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+        /* Chart bars */
+        .chart-wrap { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; }
+        .chart-bars { display: flex; align-items: flex-end; gap: 0.6rem; height: 160px; padding-top: 1rem; }
+        .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+        .bar { width: 100%; border-radius: 6px 6px 0 0; background: var(--gradient-cyan); transition: height 1.2s cubic-bezier(0.4,0,0.2,1); min-height: 4px; }
+        .bar-label { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Upload area */
+        .upload-area { border: 2px dashed var(--glass-border); border-radius: 16px; padding: 3.5rem 2rem; text-align: center; cursor: pointer; background: rgba(255,255,255,0.01); transition: all 0.3s; }
+        .upload-area:hover { border-color: var(--accent-cyan); background: rgba(0,229,255,0.04); }
+        .upload-area i { font-size: 3.5rem; color: var(--accent-cyan); margin-bottom: 1rem; display: block; }
+
+        /* Form */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); color: #fff; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; box-sizing: border-box; }
+        .form-input:focus { outline: none; border-color: var(--accent-cyan); }
+        .settings-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+        .settings-card h4 { margin: 0 0 1.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .settings-card h4 i { color: var(--accent-cyan); }
+
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-row h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .toggle-row p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+        .toggle { position: relative; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 30px; cursor: pointer; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider { background: var(--accent-cyan); }
+        .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #000; left: 3px; top: 3px; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* Followers */
+        .follower-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; transition: all 0.2s; }
+        .follower-card:hover { border-color: var(--accent-cyan); }
+        .follower-card img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+        .follower-card h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .follower-card p { margin: 0; font-size: 0.78rem; color: var(--text-muted); }
+
+        /* Messages */
+        .msg-item { display: flex; gap: 1rem; padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; cursor: pointer; }
+        .msg-item:hover { background: rgba(255,255,255,0.03); }
+        .msg-item.unread { background: rgba(0,229,255,0.04); }
+        .msg-item img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .msg-item h6 { margin: 0 0 0.2rem; font-size: 0.9rem; }
+        .msg-item p { margin: 0; font-size: 0.82rem; color: var(--text-muted); }
+        .msg-item .time { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+        footer { margin-top: auto; padding-top: 3rem; }
+        footer div { border-top: 1px solid var(--glass-border); padding: 1.5rem 0; text-align: center; color: var(--text-muted); font-size: 0.82rem; }
+
+        @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1024px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .sidebar { transform: translateX(-100%); width: 280px !important; }
+            .sidebar.open { transform: translateX(0); }
+            .toggle-desktop-sidebar { display: none; }
+            .sidebar.collapsed .sidebar-logo span, .sidebar.collapsed .sidebar-user-card div, .sidebar.collapsed .sidebar-menu a span, .sidebar.collapsed .sidebar-section-title, .sidebar.collapsed .notif-dot { display: inline-block; }
+            .sidebar.collapsed .sidebar-menu a { justify-content: flex-start; padding: 0.75rem 1rem; }
+            .sidebar.collapsed .sidebar-header { justify-content: space-between; padding: 1.25rem 1.5rem; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 5.5rem 1.25rem 2rem !important; }
+            body.sidebar-collapsed .main-content { margin-left: 0 !important; width: 100% !important; }
+            .mobile-header { display: flex !important; }
+            .close-sidebar { display: block; }
+        }
+        @media (max-width: 640px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+    </style>
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="mobile-header">
+        <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+        <button class="hamburger" id="open-sidebar" aria-label="Menu" style="display:flex; z-index:1001;"><span></span><span></span><span></span></button>
     </div>
 
     <div class="dashboard-layout">
-        <!-- Artist Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-menu">
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 1rem 0 0.5rem 1.5rem; color: var(--text-muted);">Creator</p>
-                <a href="#dashboard" class="active"><i class="uil uil-chart-line"></i> Dashboard</a>
-                <a href="#upload"><i class="uil uil-cloud-upload"></i> Upload Artwork</a>
-                <a href="#artworks"><i class="uil uil-image"></i> My Artworks</a>
-                <a href="#sales"><i class="uil uil-bill"></i> Sales Analytics</a>
-                <a href="#revenue"><i class="uil uil-dollar-alt"></i> Revenue</a>
-                <a href="#followers"><i class="uil uil-users-alt"></i> Followers</a>
-                
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin: 2rem 0 0.5rem 1.5rem; color: var(--text-muted);">Account</p>
-                <a href="#messages"><i class="uil uil-envelope"></i> Messages</a>
-                <a href="#orders"><i class="uil uil-receipt"></i> Orders</a>
-                <a href="#reviews"><i class="uil uil-star"></i> Reviews</a>
-                <a href="#profile"><i class="uil uil-user"></i> Profile</a>
-                <a href="#settings"><i class="uil uil-setting"></i> Settings</a>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <aside class="sidebar" id="dashboard-sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo"><img src="lo.webp" alt="Logo"></a>
+                <button class="toggle-desktop-sidebar" id="toggle-desktop-sidebar"><i class="uil uil-left-arrow-to-left"></i></button>
+                <button class="close-sidebar" id="close-sidebar"><i class="uil uil-times"></i></button>
             </div>
-            <div class="sidebar-footer">
-                <div class="sidebar-profile">
-                    <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Artist">
-                    <div style="flex: 1;"><h5 style="margin: 0; font-size: 0.95rem;">Marcus Vance</h5><p style="margin: 0; font-size: 0.8rem;">Artist</p></div>
-                    <a href="index.html" style="color: var(--accent-3);"><i class="uil uil-sign-out-alt"></i></a>
+            <div class="sidebar-user-card">
+                <img loading="lazy" src="IMAGE/aria.webp" alt="Artist">
+                <div>
+                    <h6>Marcus Vale</h6>
+                    <p>Artist • Verified ✓</p>
                 </div>
+            </div>
+            <div class="sidebar-menu">
+                <p class="sidebar-section-title">Studio</p>
+                <a href="#dashboard" class="dash-link active"><i class="uil uil-apps"></i> <span>Dashboard</span></a>
+                <a href="#artworks" class="dash-link"><i class="uil uil-image"></i> <span>My Artworks</span></a>
+                <a href="#upload" class="dash-link"><i class="uil uil-upload"></i> <span>Upload Artwork</span></a>
+                <a href="#collections" class="dash-link"><i class="uil uil-layer-group"></i> <span>Collections</span></a>
+
+                <p class="sidebar-section-title">Business</p>
+                <a href="#orders" class="dash-link"><i class="uil uil-receipt"></i> <span>Sales</span></a>
+                <a href="#earnings" class="dash-link"><i class="uil uil-money-bill"></i> <span>Earnings</span></a>
+                <a href="#auctions" class="dash-link"><i class="uil uil-gavel"></i> <span>Auctions</span></a>
+
+                <p class="sidebar-section-title">Community</p>
+                <a href="#followers" class="dash-link"><i class="uil uil-users-alt"></i> <span>Followers</span></a>
+                <a href="#analytics" class="dash-link"><i class="uil uil-chart-line"></i> <span>Analytics</span></a>
+                <a href="#messages" class="dash-link"><i class="uil uil-envelope"></i> <span>Messages</span> <span class="notif-dot">2</span></a>
+                <a href="#notifications" class="dash-link"><i class="uil uil-bell"></i> <span>Notifications</span></a>
+
+                <p class="sidebar-section-title">Account</p>
+                <a href="#profile" class="dash-link"><i class="uil uil-user"></i> <span>Profile</span></a>
+                <a href="#settings" class="dash-link"><i class="uil uil-setting"></i> <span>Settings</span></a>
+                <a href="login.html" class="logout-link dash-link"><i class="uil uil-sign-out-alt"></i> <span>Logout</span></a>
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <header class="dashboard-header reveal" style="position: relative;">
-                <div><h2 style="margin: 0;">Artist Dashboard</h2><p style="margin: 0; font-size: 0.9rem;">Overview of your creative portfolio.</p></div>
-                <div style="position: absolute; left: 50%; transform: translateX(-50%);">
-                    <a href="index.html" class="logo"><img src="lo.webp" alt="Logo" style="height: 40px;"></a>
+            <header class="dashboard-header">
+                <div>
+                    <h2 id="page-title">Artist Studio</h2>
+                    <p id="page-subtitle">Welcome back, Marcus! Your art is making waves.</p>
                 </div>
-                <button class="btn btn-primary magnetic-btn"><i class="uil uil-plus"></i> Create New</button>
+                <div class="header-actions">
+                    <a href="#upload" class="dash-link-trigger btn-sm btn-primary-sm" style="padding:0.6rem 1.25rem; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;"><i class="uil uil-upload"></i> Upload Art</a>
+                </div>
             </header>
 
+            <!-- 1. DASHBOARD -->
             <div id="dashboard" class="tab-content active-tab">
-            <div class="grid-3 reveal stagger-1">
-                <div class="stat-card tilt-card">
-                    <div class="tilt-card-inner">
-                        <p style="margin-bottom: 0.5rem;">Total Sales</p><h2 style="margin: 0;">124 ETH</h2>
+                <!-- Stats Row -->
+                <div class="grid-4" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal">
+                        <div><p>Total Revenue</p><h2>142 ETH</h2><div class="trend"><i class="uil uil-arrow-up"></i> +22% this month</div></div>
+                        <div class="stat-icon" style="background:rgba(0,229,255,0.12); color:var(--accent-cyan);"><i class="uil uil-money-bill"></i></div>
                     </div>
-                    <div class="stat-icon" style="background: rgba(109, 40, 217, 0.2); color: var(--accent-1);"><i class="uil uil-dollar-alt"></i></div>
+                    <div class="stat-card reveal">
+                        <div><p>Artworks Sold</p><h2>87</h2><div class="trend"><i class="uil uil-arrow-up"></i> +5 this month</div></div>
+                        <div class="stat-icon" style="background:rgba(124,58,237,0.12); color:var(--accent-violet);"><i class="uil uil-shopping-cart"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div><p>Total Followers</p><h2>4.8K</h2><div class="trend"><i class="uil uil-arrow-up"></i> +320 this month</div></div>
+                        <div class="stat-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i class="uil uil-users-alt"></i></div>
+                    </div>
+                    <div class="stat-card reveal">
+                        <div><p>Published Artworks</p><h2>63</h2><div class="trend" style="color:var(--text-muted);"><i class="uil uil-image"></i> 5 drafts pending</div></div>
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="uil uil-image"></i></div>
+                    </div>
                 </div>
-                <div class="stat-card tilt-card">
-                    <div class="tilt-card-inner">
-                        <p style="margin-bottom: 0.5rem;">Total Views</p><h2 style="margin: 0;">45.2K</h2>
+
+                <!-- Chart + Recent Sales -->
+                <div class="grid-2" style="margin-bottom:2rem;">
+                    <div class="chart-wrap">
+                        <div class="section-header" style="margin-bottom:0.5rem;">
+                            <h3>Monthly Revenue</h3>
+                            <span style="font-size:0.82rem; color:var(--accent-cyan);">2025</span>
+                        </div>
+                        <p style="margin:0 0 1rem; font-size:0.82rem; color:var(--text-muted);">ETH earned per month</p>
+                        <div class="chart-bars" id="chart-bars">
+                            <div class="bar-item"><div class="bar" style="height:40%;"></div><span class="bar-label">Jan</span></div>
+                            <div class="bar-item"><div class="bar" style="height:55%;"></div><span class="bar-label">Feb</span></div>
+                            <div class="bar-item"><div class="bar" style="height:35%;"></div><span class="bar-label">Mar</span></div>
+                            <div class="bar-item"><div class="bar" style="height:70%;"></div><span class="bar-label">Apr</span></div>
+                            <div class="bar-item"><div class="bar" style="height:60%;"></div><span class="bar-label">May</span></div>
+                            <div class="bar-item"><div class="bar" style="height:85%;"></div><span class="bar-label">Jun</span></div>
+                            <div class="bar-item"><div class="bar" style="height:75%;"></div><span class="bar-label">Jul</span></div>
+                            <div class="bar-item"><div class="bar" style="height:90%;"></div><span class="bar-label">Aug</span></div>
+                            <div class="bar-item"><div class="bar" style="height:100%;"></div><span class="bar-label">Sep</span></div>
+                            <div class="bar-item"><div class="bar" style="height:80%;"></div><span class="bar-label">Oct</span></div>
+                            <div class="bar-item"><div class="bar" style="height:65%;"></div><span class="bar-label">Nov</span></div>
+                            <div class="bar-item"><div class="bar" style="height:95%;"></div><span class="bar-label">Dec</span></div>
+                        </div>
                     </div>
-                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-eye"></i></div>
+                    <div>
+                        <div class="section-header"><h3>Recent Sales</h3><a href="#orders" class="dash-link-trigger">View All →</a></div>
+                        <div class="list-group">
+                            <div class="list-item reveal"><div style="display:flex;gap:1rem;align-items:center;"><img loading="lazy" src="IMAGE/camile cover.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Neon Genesis</h6><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">to @jane_doe • Today</p></div></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;color:var(--accent-cyan);">0.8 ETH</p><span class="status-badge badge-success">Paid</span></div></div>
+                            <div class="list-item reveal"><div style="display:flex;gap:1rem;align-items:center;"><img loading="lazy" src="IMAGE/camile.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Abstract Dimensions</h6><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">to @alex_k • Sep 28</p></div></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;color:var(--accent-cyan);">1.2 ETH</p><span class="status-badge badge-success">Paid</span></div></div>
+                            <div class="list-item reveal"><div style="display:flex;gap:1rem;align-items:center;"><img loading="lazy" src="IMAGE/chromatic pulse.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Cyberpunk City</h6><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">to @pixel_hunter • Sep 15</p></div></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;color:var(--accent-cyan);">2.5 ETH</p><span class="status-badge badge-success">Paid</span></div></div>
+                            <div class="list-item reveal"><div style="display:flex;gap:1rem;align-items:center;"><img loading="lazy" src="IMAGE/cosmic art.webp" style="width:44px;height:44px;border-radius:8px;object-fit:cover;" alt="Art"><div><h6 style="margin:0 0 0.2rem;font-size:0.88rem;">Ethereal Spaces</h6><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">to @collector99 • Sep 1</p></div></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;color:var(--accent-cyan);">3.1 ETH</p><span class="status-badge badge-success">Paid</span></div></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card tilt-card">
-                    <div class="tilt-card-inner">
-                        <p style="margin-bottom: 0.5rem;">Followers</p><h2 style="margin: 0;">8.2K</h2>
+
+                <!-- Top Artworks -->
+                <div>
+                    <div class="section-header"><h3>🔥 Top Performing Artworks</h3><a href="#artworks" class="dash-link-trigger">All Artworks →</a></div>
+                    <div class="art-grid">
+                        <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/cosmic visiions.webp" alt="Art"><div class="art-card-body"><h5>Neon Genesis</h5><p class="artist">Sold 12 copies</p><p class="price">0.8 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-primary-sm">View</button></div></div></div>
+                        <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/cyber.webp" alt="Art"><div class="art-card-body"><h5>Abstract Dimensions</h5><p class="artist">Sold 8 copies</p><p class="price">1.2 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-primary-sm">View</button></div></div></div>
+                        <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/dante cover.webp" alt="Art"><div class="art-card-body"><h5>Cyberpunk City</h5><p class="artist">Sold 5 copies</p><p class="price">2.5 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-primary-sm">View</button></div></div></div>
+                        <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/dante.webp" alt="Art"><div class="art-card-body"><h5>Ethereal Spaces</h5><p class="artist">Sold 4 copies</p><p class="price">3.1 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-primary-sm">View</button></div></div></div>
                     </div>
-                    <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-3);"><i class="uil uil-users-alt"></i></div>
                 </div>
             </div>
 
-            <div class="grid-2 reveal stagger-2" style="margin-top: 3rem;">
-                <div class="chart-container">
-                    <h3 style="margin: 0;">Revenue Analytics</h3>
-                    <div class="mock-chart">
-                        <div class="bar" style="height: 30%;"></div><div class="bar" style="height: 50%;"></div>
-                        <div class="bar" style="height: 20%;"></div><div class="bar" style="height: 70%;"></div>
-                        <div class="bar" style="height: 40%;"></div><div class="bar" style="height: 90%;"></div>
+            <!-- 2. UPLOAD ARTWORK -->
+            <div id="upload" class="tab-content">
+                <div style="max-width:720px;">
+                    <div class="upload-area" id="upload-area">
+                        <i class="uil uil-cloud-upload"></i>
+                        <h3 style="margin:0 0 0.5rem;">Drop your artwork here</h3>
+                        <p style="color:var(--text-muted); margin:0 0 1.5rem; font-size:0.9rem;">PNG, JPG, GIF, WEBP, MP4 — Max 100MB</p>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.7rem 2rem; font-size:0.9rem;">Browse Files</button>
                     </div>
-                </div>
-                <div class="chart-container">
-                    <h3 style="margin: 0;">Recent Activity</h3>
-                    <div class="activity-timeline">
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="uil uil-shopping-cart"></i></div>
-                            <div><h5 style="margin: 0;">Art Sold</h5><p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">"Neon Genesis" sold for 2.5 ETH</p></div>
+                    <div class="settings-card reveal" style="margin-top:1.5rem;">
+                        <h4><i class="uil uil-pen"></i> Artwork Details</h4>
+                        <div class="form-group"><label class="form-label">Title *</label><input type="text" class="form-input" placeholder="Give your artwork a name"></div>
+                        <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" rows="4" placeholder="Describe your artwork, its inspiration, and what makes it unique..." style="resize:vertical;"></textarea></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div class="form-group"><label class="form-label">Price (ETH) *</label><input type="number" class="form-input" placeholder="0.00" step="0.01"></div>
+                            <div class="form-group"><label class="form-label">Edition Type</label><select class="form-input"><option>1 of 1 (Unique)</option><option>Limited Edition</option><option>Open Edition</option></select></div>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-icon" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-2);"><i class="uil uil-user-plus"></i></div>
-                            <div><h5 style="margin: 0;">New Follower</h5><p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">@crypto_king started following you</p></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div class="form-group"><label class="form-label">Category</label><select class="form-input"><option>Abstract</option><option>Digital Painting</option><option>3D Art</option><option>Photography</option><option>Generative</option><option>Animation</option></select></div>
+                            <div class="form-group"><label class="form-label">Royalty %</label><input type="number" class="form-input" placeholder="10" min="0" max="30"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Tags (comma separated)</label><input type="text" class="form-input" placeholder="neon, cyber, abstract, futuristic"></div>
+                        <div class="form-group"><label class="form-label">Blockchain</label><select class="form-input"><option>Ethereum (ETH)</option><option>Polygon (MATIC)</option><option>Solana (SOL)</option></select></div>
+                        <div style="display:flex; gap:1rem; margin-top:0.5rem; flex-wrap:wrap;">
+                            <button class="btn-sm btn-primary-sm" style="padding:0.7rem 2rem; font-size:0.9rem;">Publish Artwork</button>
+                            <button class="btn-sm btn-outline-sm" style="padding:0.7rem 1.5rem; font-size:0.9rem;">Save as Draft</button>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
-            
-            <!-- Other Tabs Placeholder -->
-            <div id="portfolio" class="tab-content"><h2 style="margin-bottom: 2rem;">Portfolio</h2><p style="color: var(--text-muted);">Manage your artworks here.</p></div>
-            <div id="sales" class="tab-content"><h2 style="margin-bottom: 2rem;">Sales</h2><p style="color: var(--text-muted);">View detailed sales analytics.</p></div>
-            <div id="analytics" class="tab-content"><h2 style="margin-bottom: 2rem;">Analytics</h2><p style="color: var(--text-muted);">Deep dive into profile statistics.</p></div>
-            <div id="earnings" class="tab-content"><h2 style="margin-bottom: 2rem;">Earnings & Payouts</h2><p style="color: var(--text-muted);">Manage your revenue and withdrawals.</p></div>
-            <div id="messages" class="tab-content"><h2 style="margin-bottom: 2rem;">Messages</h2><p style="color: var(--text-muted);">Inbox is empty.</p></div>
-            <div id="settings" class="tab-content"><h2 style="margin-bottom: 2rem;">Settings</h2><p style="color: var(--text-muted);">Artist profile settings.</p></div>
 
-            <!-- Footer -->
-    <footer style="margin-top: 4rem;">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
-                        <img src="lo.webp" alt="Stackly Logo">
-                    </a>
-                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
-                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+            <!-- 3. MY ARTWORKS -->
+            <div id="artworks" class="tab-content">
+                <div style="display:flex; gap:0.75rem; margin-bottom:1.5rem; flex-wrap:wrap; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button class="btn-sm btn-primary-sm">All (63)</button>
+                        <button class="btn-sm btn-outline-sm">Published (58)</button>
+                        <button class="btn-sm btn-outline-sm">Drafts (5)</button>
+                        <button class="btn-sm btn-outline-sm">Hidden (0)</button>
+                    </div>
+                    <a href="#upload" class="dash-link-trigger btn-sm btn-outline-sm" style="text-decoration:none;"><i class="uil uil-plus"></i> New Artwork</a>
+                </div>
+                <div class="art-grid">
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/david.webp" alt="Art"><div class="art-card-body"><h5>Neon Genesis</h5><p class="artist">1 of 1 • 12 sold</p><p class="price">0.8 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/digital harmony.webp" alt="Art"><div class="art-card-body"><h5>Abstract Dimensions</h5><p class="artist">Limited • 8 sold</p><p class="price">1.2 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/elena.webp" alt="Art"><div class="art-card-body"><h5>Cyberpunk City</h5><p class="artist">1 of 1 • 5 sold</p><p class="price">2.5 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/emma watson.webp" alt="Art"><div class="art-card-body"><h5>Ethereal Spaces</h5><p class="artist">Open Edition • 4 sold</p><p class="price">3.1 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                    <div class="art-card tilt-card reveal" style="border-style:dashed;"><img loading="lazy" class="art-card-img" src="IMAGE/etheral bloom.webp" alt="Art"><div class="art-card-body"><h5>Neon Roads <span class="status-badge badge-pending" style="margin-left:0.4rem;vertical-align:middle;font-size:0.65rem;">Draft</span></h5><p class="artist">Not published yet</p><p class="price">— ETH</p><div class="art-card-actions"><button class="btn-sm btn-primary-sm">Publish</button><button class="btn-sm btn-outline-sm">Edit</button></div></div></div>
+                    <div class="art-card tilt-card reveal"><img loading="lazy" class="art-card-img" src="IMAGE/ethereal portraits.webp" alt="Art"><div class="art-card-body"><h5>Aurora Borealis</h5><p class="artist">1 of 1 • 3 sold</p><p class="price">4.9 ETH</p><div class="art-card-actions"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-danger-sm"><i class="uil uil-trash-alt"></i></button></div></div></div>
+                </div>
+            </div>
+
+            <!-- 4. COLLECTIONS -->
+            <div id="collections" class="tab-content">
+                <div style="display:flex; justify-content:flex-end; margin-bottom:1.5rem;">
+                    <button class="btn-sm btn-primary-sm" style="padding:0.6rem 1.25rem;"><i class="uil uil-plus"></i> New Collection</button>
+                </div>
+                <div class="grid-3">
+                    <div style="background:var(--bg-card); border:1px solid var(--glass-border); border-radius:16px; overflow:hidden; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+                        <div style="position:relative; height:160px; overflow:hidden;"><img loading="lazy" src="IMAGE/felix cover.webp" style="width:100%;height:100%;object-fit:cover;" alt="Collection"><div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);"></div><span style="position:absolute;top:0.75rem;right:0.75rem;background:var(--accent-cyan);color:#000;border-radius:10px;padding:3px 10px;font-size:0.72rem;font-weight:700;">12 items</span></div>
+                        <div style="padding:1.25rem;"><h5 style="margin:0 0 0.4rem;">Neon Futures</h5><p style="margin:0 0 1rem;font-size:0.82rem;color:var(--text-muted);">Cyberpunk-inspired digital paintings</p><div style="display:flex;gap:0.5rem;"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-primary-sm">View</button></div></div>
+                    </div>
+                    <div style="background:var(--bg-card); border:1px solid var(--glass-border); border-radius:16px; overflow:hidden; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+                        <div style="position:relative; height:160px; overflow:hidden;"><img loading="lazy" src="IMAGE/felix.webp" style="width:100%;height:100%;object-fit:cover;" alt="Collection"><div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);"></div><span style="position:absolute;top:0.75rem;right:0.75rem;background:var(--accent-violet);color:#fff;border-radius:10px;padding:3px 10px;font-size:0.72rem;font-weight:700;">8 items</span></div>
+                        <div style="padding:1.25rem;"><h5 style="margin:0 0 0.4rem;">Cosmic Abstracts</h5><p style="margin:0 0 1rem;font-size:0.82rem;color:var(--text-muted);">Deep space and cosmic colors</p><div style="display:flex;gap:0.5rem;"><button class="btn-sm btn-outline-sm">Edit</button><button class="btn-sm btn-primary-sm">View</button></div></div>
+                    </div>
+                    <div style="background:var(--bg-card); border:2px dashed var(--glass-border); border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem 2rem; text-align:center; cursor:pointer; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--glass-border)'">
+                        <i class="uil uil-plus-circle" style="font-size:3rem; color:var(--accent-cyan); margin-bottom:1rem;"></i>
+                        <h5 style="margin:0 0 0.5rem;">Create New Collection</h5>
+                        <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">Group your artworks into themed sets</p>
                     </div>
                 </div>
-                <div class="footer-col">
-                    <h4>Marketplace</h4>
-                    <ul class="footer-links">
-                        <li><a href="404.html">All Artworks</a></li>
-                        <li><a href="404.html">New Releases</a></li>
-                        <li><a href="404.html">Top Artists</a></li>
-                        <li><a href="404.html">Collections</a></li>
-                    </ul>
+            </div>
+
+            <!-- 5. ANALYTICS -->
+            <div id="analytics" class="tab-content">
+                <div class="grid-4" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal"><div><p>Views This Month</p><h2>28.4K</h2><div class="trend"><i class="uil uil-arrow-up"></i> +14%</div></div><div class="stat-icon" style="background:rgba(0,229,255,0.12);color:var(--accent-cyan);"><i class="uil uil-eye"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Click-Through Rate</p><h2>6.2%</h2><div class="trend"><i class="uil uil-arrow-up"></i> +0.8%</div></div><div class="stat-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-violet);"><i class="uil uil-mouse"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Avg Sale Price</p><h2>1.63 ETH</h2><div class="trend"><i class="uil uil-arrow-up"></i> +0.2 ETH</div></div><div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="uil uil-chart-line"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Conversion Rate</p><h2>2.8%</h2><div class="trend"><i class="uil uil-arrow-up"></i> +0.4%</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="uil uil-percentage"></i></div></div>
                 </div>
-                <div class="footer-col">
-                    <h4>My Account</h4>
-                    <ul class="footer-links">
-                        <li><a href="login.html">Profile</a></li>
-                        <li><a href="404.html">Favorites</a></li>
-                        <li><a href="404.html">My Collections</a></li>
-                        <li><a href="404.html">Settings</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="404.html">Careers</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="404.html">Privacy Policy</a></li>
-                    </ul>
+                <div class="grid-2">
+                    <div class="chart-wrap"><div class="section-header" style="margin-bottom:0.5rem;"><h3>Monthly Sales Volume</h3><span style="font-size:0.82rem;color:var(--accent-cyan);">Units</span></div><p style="margin:0 0 1rem;font-size:0.82rem;color:var(--text-muted);">Number of artworks sold per month</p><div class="chart-bars"><div class="bar-item"><div class="bar" style="height:30%;background:var(--gradient-violet);"></div><span class="bar-label">Jan</span></div><div class="bar-item"><div class="bar" style="height:45%;background:var(--gradient-violet);"></div><span class="bar-label">Feb</span></div><div class="bar-item"><div class="bar" style="height:60%;background:var(--gradient-violet);"></div><span class="bar-label">Mar</span></div><div class="bar-item"><div class="bar" style="height:50%;background:var(--gradient-violet);"></div><span class="bar-label">Apr</span></div><div class="bar-item"><div class="bar" style="height:70%;background:var(--gradient-violet);"></div><span class="bar-label">May</span></div><div class="bar-item"><div class="bar" style="height:85%;background:var(--gradient-violet);"></div><span class="bar-label">Jun</span></div><div class="bar-item"><div class="bar" style="height:95%;background:var(--gradient-violet);"></div><span class="bar-label">Jul</span></div><div class="bar-item"><div class="bar" style="height:80%;background:var(--gradient-violet);"></div><span class="bar-label">Aug</span></div><div class="bar-item"><div class="bar" style="height:100%;background:var(--gradient-violet);"></div><span class="bar-label">Sep</span></div><div class="bar-item"><div class="bar" style="height:75%;background:var(--gradient-violet);"></div><span class="bar-label">Oct</span></div><div class="bar-item"><div class="bar" style="height:60%;background:var(--gradient-violet);"></div><span class="bar-label">Nov</span></div><div class="bar-item"><div class="bar" style="height:90%;background:var(--gradient-violet);"></div><span class="bar-label">Dec</span></div></div></div>
+                    <div><div class="section-header"><h3>Top Categories</h3></div><div class="list-group"><div class="list-item reveal"><span>Abstract</span><div style="display:flex;align-items:center;gap:1rem;"><div style="width:100px;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;"><div style="width:65%;height:100%;background:var(--accent-cyan);border-radius:10px;"></div></div><span style="min-width:32px;text-align:right;font-size:0.85rem;">65%</span></div></div><div class="list-item reveal"><span>Cyber</span><div style="display:flex;align-items:center;gap:1rem;"><div style="width:100px;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;"><div style="width:48%;height:100%;background:var(--accent-violet);border-radius:10px;"></div></div><span style="min-width:32px;text-align:right;font-size:0.85rem;">48%</span></div></div><div class="list-item reveal"><span>Surreal</span><div style="display:flex;align-items:center;gap:1rem;"><div style="width:100px;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;"><div style="width:30%;height:100%;background:#f59e0b;border-radius:10px;"></div></div><span style="min-width:32px;text-align:right;font-size:0.85rem;">30%</span></div></div><div class="list-item reveal"><span>Nature</span><div style="display:flex;align-items:center;gap:1rem;"><div style="width:100px;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;"><div style="width:18%;height:100%;background:#10b981;border-radius:10px;"></div></div><span style="min-width:32px;text-align:right;font-size:0.85rem;">18%</span></div></div></div></div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Stackly. All rights reserved.</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <a href="404.html">Terms</a>
-                    <a href="404.html">Privacy</a>
+
+            <!-- 6. EARNINGS -->
+            <div id="earnings" class="tab-content">
+                <div class="grid-3" style="margin-bottom:2rem;">
+                    <div class="stat-card reveal"><div><p>Available Balance</p><h2>42.3 ETH</h2><div class="trend" style="color:var(--text-muted);">Ready to withdraw</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10b981;"><i class="uil uil-wallet"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Pending Payouts</p><h2>8.1 ETH</h2><div class="trend" style="color:#f59e0b;">Processing 3–5 days</div></div><div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="uil uil-clock"></i></div></div>
+                    <div class="stat-card reveal"><div><p>Lifetime Earnings</p><h2>142 ETH</h2><div class="trend"><i class="uil uil-arrow-up"></i> +22 ETH this month</div></div><div class="stat-icon" style="background:rgba(0,229,255,0.12);color:var(--accent-cyan);"><i class="uil uil-chart-growth"></i></div></div>
+                </div>
+                <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+                    <div class="section-header"><h3>Payout History</h3><button class="btn-sm btn-outline-sm">Export CSV</button></div>
+                    <div class="list-group" style="border:none;">
+                        <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Payout #PAY-0042</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Oct 1, 2025 → Wallet 0x1aB3...</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">18.5 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                        <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Payout #PAY-0041</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Sep 1, 2025 → Wallet 0x1aB3...</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">24.2 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                        <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Payout #PAY-0040</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Aug 1, 2025 → Wallet 0x1aB3...</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">31.1 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                    </div>
+                </div>
+                <button class="btn-sm btn-primary-sm" style="padding:0.75rem 2rem;font-size:0.9rem;"><i class="uil uil-money-withdrawal"></i> Request Payout</button>
+            </div>
+
+            <!-- 7. ORDERS -->
+            <div id="orders" class="tab-content">
+                <div class="list-group">
+                    <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Order #ORD-8472</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Oct 12 • Neon Genesis → @jane_doe</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">0.8 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                    <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Order #ORD-7391</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Sep 28 • Abstract Dimensions → @alex_k</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">1.2 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                    <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Order #ORD-6120</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Sep 15 • Cyberpunk City → @pixel_hunter</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">2.5 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                    <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Order #ORD-5891</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Sep 1 • Ethereal Spaces → @collector99</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">3.1 ETH</p><span class="status-badge badge-success">Completed</span></div></div>
+                    <div class="list-item reveal"><div><h6 style="margin:0 0 0.2rem;">Order #ORD-4234</h6><p style="margin:0;font-size:0.82rem;color:var(--text-muted);">Aug 20 • Aurora Borealis → @nft_whale</p></div><div style="text-align:right;"><p style="margin:0 0 0.2rem;font-weight:700;">4.9 ETH</p><span class="status-badge badge-processing">Processing</span></div></div>
                 </div>
             </div>
-        </div>
-    </footer>
+
+            <!-- 8. FOLLOWERS -->
+            <div id="followers" class="tab-content">
+                <div style="margin-bottom:1rem; color:var(--text-muted); font-size:0.9rem;">Showing 4,821 followers</div>
+                <div class="grid-3">
+                    <div class="follower-card"><img loading="lazy" src="IMAGE/flora digitalis.webp" alt="F"><div><h6>Jane Doe</h6><p>@janedoe • Top Collector</p></div></div>
+                    <div class="follower-card"><img loading="lazy" src="IMAGE/fractured dimensions.webp" alt="F"><div><h6>Alex Krane</h6><p>@alex_k • Collector</p></div></div>
+                    <div class="follower-card"><img loading="lazy" src="IMAGE/future worlds.webp" alt="F"><div><h6>Pixel Hunter</h6><p>@pixel_hunter • Artist</p></div></div>
+                    <div class="follower-card"><img loading="lazy" src="IMAGE/glith manifesto.webp" alt="F"><div><h6>Sophia Lin</h6><p>@sophia_lin • Curator</p></div></div>
+                    <div class="follower-card"><img loading="lazy" src="IMAGE/hero1.webp" alt="F"><div><h6>Collector99</h6><p>@collector99 • Whale</p></div></div>
+                    <div class="follower-card"><img loading="lazy" src="IMAGE/images (1).webp" alt="F"><div><h6>Mia Chen</h6><p>@mia_chen • New Fan</p></div></div>
+                </div>
+            </div>
+
+            <!-- 9. MESSAGES -->
+            <div id="messages" class="tab-content">
+                <div class="list-group">
+                    <div class="msg-item unread"><img loading="lazy" src="IMAGE/images (2).webp" alt="U"><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6>Jane Doe</h6><span class="time">2h ago</span></div><p>Hey! I love your new collection. Is "Neon Genesis #7" still available?</p></div></div>
+                    <div class="msg-item unread"><img loading="lazy" src="IMAGE/images (3).webp" alt="U"><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6>Alex Krane</h6><span class="time">Yesterday</span></div><p>Would you consider doing a commissioned piece? I have a concept in mind...</p></div></div>
+                    <div class="msg-item"><img loading="lazy" src="IMAGE/images (4).webp" alt="U"><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6>Sophia Lin</h6><span class="time">3 days ago</span></div><p>Your work was featured in our weekly digest! Congrats! 🎉</p></div></div>
+                    <div class="msg-item"><img loading="lazy" src="IMAGE/jamal cover.webp" alt="U"><div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h6>Collector99</h6><span class="time">1 week ago</span></div><p>I purchased Aurora Borealis. Absolutely stunning work.</p></div></div>
+                </div>
+            </div>
+
+            <!-- 10. PROFILE -->
+            <div id="profile" class="tab-content">
+                <div style="display:grid;grid-template-columns:260px 1fr;gap:2rem;">
+                    <div>
+                        <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;padding:2rem;text-align:center;">
+                            <img loading="lazy" src="IMAGE/jamal.webp" alt="Artist" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(0,229,255,0.4);margin:0 auto 1rem;display:block;">
+                            <h4 style="margin:0 0 0.25rem;">Marcus Vale</h4>
+                            <p style="color:var(--accent-cyan);margin:0;">@marcus_v</p>
+                            <p style="margin:0.75rem 0 0;font-size:0.82rem;color:var(--text-muted);">Verified Artist ✓</p>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1.5rem;">
+                                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:0.75rem;text-align:center;"><h5 style="margin:0 0 0.2rem;">4.8K</h5><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">Followers</p></div>
+                                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:0.75rem;text-align:center;"><h5 style="margin:0 0 0.2rem;">63</h5><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">Artworks</p></div>
+                                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:0.75rem;text-align:center;"><h5 style="margin:0 0 0.2rem;">87</h5><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">Sold</p></div>
+                                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:0.75rem;text-align:center;"><h5 style="margin:0 0 0.2rem;">142</h5><p style="margin:0;font-size:0.75rem;color:var(--text-muted);">ETH Total</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-card reveal" style="margin-bottom:0;">
+                        <h4><i class="uil uil-user-circle"></i> Edit Artist Profile</h4>
+                        <div class="form-group"><label class="form-label">Artist Name</label><input type="text" class="form-input" value="Marcus Vale"></div>
+                        <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-input" value="@marcus_v"></div>
+                        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" value="marcus@stackly.art"></div>
+                        <div class="form-group"><label class="form-label">Bio</label><textarea class="form-input" rows="4" style="resize:none;">Digital artist exploring the intersections of neon aesthetics, cyberpunk, and surrealism. Based in Los Angeles.</textarea></div>
+                        <div class="form-group"><label class="form-label">Website</label><input type="url" class="form-input" value="https://marcusvale.art"></div>
+                        <div class="form-group"><label class="form-label">Twitter / X</label><input type="text" class="form-input" value="@marcus_v_art"></div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.75rem 2rem;font-size:0.9rem;">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. SETTINGS -->
+            <div id="settings" class="tab-content">
+                <div style="max-width:700px;">
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-lock-alt"></i> Security</h4>
+                        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" value="marcus@stackly.art"></div>
+                        <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" placeholder="••••••••"></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" placeholder="••••••••"></div>
+                            <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input" placeholder="••••••••"></div>
+                        </div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.7rem 1.5rem;">Update Password</button>
+                    </div>
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-bell"></i> Notifications</h4>
+                        <div class="toggle-row"><div><h6>New Sale</h6><p>When someone buys your artwork</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div><h6>New Follower</h6><p>When someone follows you</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div><h6>New Message</h6><p>Direct messages from buyers</p></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div><h6>Artwork Featured</h6><p>When your work gets curated</p></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                    </div>
+                    <div class="settings-card reveal">
+                        <h4><i class="uil uil-wallet"></i> Payout Settings</h4>
+                        <div class="form-group"><label class="form-label">Wallet Address</label><input type="text" class="form-input" value="0x1aB3c...d94F2"></div>
+                        <div class="form-group"><label class="form-label">Preferred Blockchain</label><select class="form-input"><option>Ethereum (ETH)</option><option>Polygon (MATIC)</option></select></div>
+                        <div class="form-group"><label class="form-label">Default Royalty %</label><input type="number" class="form-input" value="10" min="0" max="30"></div>
+                        <button class="btn-sm btn-primary-sm" style="padding:0.7rem 1.5rem;">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUCTIONS (Placeholder) -->
+            <div id="auctions" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-gavel" style="font-size:3rem; color:var(--accent-cyan); display:block; margin-bottom:1rem;"></i>
+                    <h4>Auctions</h4>
+                    <p>Coming soon: Manage your active auctions and track bidding history.</p>
+                </div>
+            </div>
+
+            <!-- NOTIFICATIONS (Placeholder) -->
+            <div id="notifications" class="tab-content">
+                <div class="stat-card reveal" style="text-align:center; display:block; padding:3rem;">
+                    <i class="uil uil-bell" style="font-size:3rem; color:var(--accent-cyan); display:block; margin-bottom:1rem;"></i>
+                    <h4>Notifications</h4>
+                    <p>Coming soon: View your notification history.</p>
+                </div>
+            </div>
+
+            <footer><div>&copy; 2026 Stackly. All rights reserved.</div></footer>
         </main>
     </div>
-    <script src="js/main.js?v=2"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const bars = document.querySelectorAll('.bar');
-                bars.forEach(bar => {
-                    const h = bar.style.height;
-                    bar.style.height = '0%';
-                    setTimeout(() => { bar.style.height = h; }, 100);
-                });
-            }, 600);
-        });
-    </script>
+
+    <script src="js/main.js"></script>
+    <script src="js/dashboards.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+

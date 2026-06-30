@@ -3,55 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collections | Stackly</title>
+    <title>Collections | Stackly — Curated Digital Art</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        .page-header { padding: 10rem 0 4rem; text-align: center; }
-        .page-header h1 { font-size: 3.5rem; margin-bottom: 1rem; }
-        
-        .collection-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 1rem; transition: var(--transition-normal); overflow: hidden; }
-        .collection-images { display: grid; grid-template-columns: 2fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; height: 250px; border-radius: var(--radius-md); overflow: hidden; }
-        .collection-main-img { width: 100%; height: 100%; object-fit: cover; }
-        .collection-sub-images { display: grid; grid-template-rows: 1fr 1fr; gap: 0.5rem; }
-        .collection-sub-img { width: 100%; height: 100%; object-fit: cover; }
-        .collection-info { display: flex; justify-content: space-between; align-items: flex-end; }
-        .collection-creator { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; }
-        .collection-creator img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
-        
-        .cat-scroll { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1.5rem; scrollbar-width: none; margin-bottom: 4rem; }
-        .cat-card-small { min-width: 200px; height: 120px; position: relative; border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .cat-card-small img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: var(--transition-fast); }
-        .cat-card-small:hover img { transform: scale(1.1); opacity: 0.8; }
-        .cat-card-small h4 { position: relative; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin: 0; }
+        /* ── Hero amber-tinted gradient ── */
+        .collections-hero {
+            background: linear-gradient(160deg, rgba(245,158,11,0.12) 0%, rgba(10,10,15,0) 45%, rgba(0,229,255,0.06) 100%);
+        }
+        .collections-hero .page-hero {
+            padding: 11rem 0 5rem;
+            text-align: center;
+        }
+        .collections-hero .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── Featured Collection Banner ── */
+        .featured-banner {
+            position: relative;
+            min-height: 420px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+        }
+        .featured-banner-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+        .featured-banner:hover .featured-banner-img {
+            transform: scale(1.03);
+        }
+        .featured-banner-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.55) 40%, transparent 80%);
+        }
+        .featured-banner-content {
+            position: relative;
+            z-index: 2;
+            padding: 3rem;
+            width: 100%;
+        }
+        .featured-banner-content .badge {
+            margin-bottom: 1rem;
+        }
+        .featured-banner-content h2 {
+            font-size: 2.8rem;
+            margin-bottom: 0.75rem;
+        }
+        .featured-banner-content p {
+            max-width: 560px;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+        .featured-stats {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .featured-stat span:first-child {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        .featured-stat span:last-child {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ── Collection Cards ── */
+        .collection-cover {
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border-radius: var(--radius-md);
+        }
+        .collection-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card:hover .collection-cover img {
+            transform: scale(1.08);
+        }
+        .collection-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+        .collection-meta img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-violet);
+        }
+        .collection-meta span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .collection-stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 0.75rem;
+        }
+        .collection-stat-item {
+            text-align: center;
+        }
+        .collection-stat-item .label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+        .collection-stat-item .value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ── Category Cards ── */
+        .category-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            border-radius: var(--radius-lg);
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+        .category-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-violet);
+        }
+        .category-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(0,229,255,0.1));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.6rem;
+            color: var(--accent-cyan);
+            transition: var(--transition-fast);
+        }
+        .category-card:hover .category-icon {
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+            color: #fff;
+        }
+        .category-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.3rem;
+        }
+        .category-card .count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Section header ── */
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-head h2 {
+            font-size: 2.2rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .collections-hero .page-hero { padding: 8rem 0 3rem; }
+            .featured-banner { min-height: 320px; }
+            .featured-banner-content h2 { font-size: 1.8rem; }
+            .featured-stats { gap: 1.5rem; }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .grid-4 { grid-template-columns: 1fr; }
+            .hero-actions { flex-direction: column; align-items: center; }
+        }
     </style>
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
-        <div id="premium-loader">
+
+    <!-- ═══════ Loading Screen ═══════ -->
+    <div id="premium-loader">
         <canvas id="loader-canvas"></canvas>
-        <div class="loader-noise"></div>
-        <div class="loader-mesh"></div>
         <div class="loader-content">
             <div class="loader-logo-container">
                 <div class="loader-ring"></div>
-                <img src="lo.webp" alt="Loading Logo" class="loader-logo-img">
+                <img src="lo.webp" alt="Loading" class="loader-logo-img">
             </div>
             <div class="loader-text-container">
                 <span id="loader-text"></span><span class="loader-cursor"></span>
             </div>
         </div>
         <div class="loader-progress-container">
-            <div class="loader-progress-bar" id="loader-progress">
-                <div class="loader-shimmer"></div>
-            </div>
+            <div class="loader-progress-bar" id="loader-progress"></div>
         </div>
     </div>
 
+    <!-- ═══════ Aurora Background ═══════ -->
     <div class="aurora-bg"><div class="glow-3"></div></div>
 
+    <!-- ═══════ Header ═══════ -->
     <header>
         <div class="container nav-container">
-            <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly Logo"></a>
+            <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly"></a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="marketplace.html">Marketplace</a></li>
@@ -59,262 +244,594 @@
                 <li><a href="artists.html">Artists</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
+            <li class="mobile-login-btn"><a href="login.html" class="btn btn-primary" style="display:block;text-align:center;">Login</a></li>
             </ul>
             <div class="nav-actions">
-                <a href="login.html" class="btn btn-outline magnetic-btn">Login</a>
+                <a href="login.html" class="btn btn-outline btn-sm magnetic-btn">Login</a>
                 <a href="signup.html" class="btn btn-gradient-border magnetic-btn"><span>Sign Up</span></a>
+                <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
             </div>
         </div>
     </header>
 
-    <div class="page-header container reveal">
-        <h1>Curated <span class="text-gradient">Collections</span></h1>
-        <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Explore the most exclusive and meticulously curated sets of digital masterpieces.</p>
-    </div>
-
-    <main class="container">
-        <!-- Featured Collection Banner -->
-        <div class="reveal tilt-card" style="margin-bottom: 4rem; position: relative; border-radius: var(--radius-lg); overflow: hidden; height: 400px;">
-            <div class="tilt-card-inner" style="height: 100%;">
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop" style="width: 100%; height: 100%; object-fit: cover;" alt="Featured">
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); display: flex; align-items: center; padding: 4rem;">
-                    <div style="max-width: 500px;">
-                        <span style="background: var(--gradient-primary); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 1rem; display: inline-block;">Collection of the Month</span>
-                        <h2 style="font-size: 3rem; margin-bottom: 1rem;">Neon Genesis Vol. II</h2>
-                        <p style="margin-bottom: 2rem; color: var(--text-muted);">The highly anticipated sequel to the legendary cyberpunk collection by @elena_creates.</p>
-                        <a href="marketplace.html" class="btn btn-primary magnetic-btn">Explore Collection</a>
-                    </div>
+    <!-- ═══════════════════════════════════════════════
+         SECTION 0 — HERO (Amber-Tinted)
+    ═══════════════════════════════════════════════ -->
+    <section class="collections-hero">
+        <div class="page-hero">
+            <div class="container">
+                <span class="section-label reveal">CURATED</span>
+                <h1 class="reveal" style="font-size:3.6rem;line-height:1.15;">
+                    Explore<br><span class="text-gradient-cyan">Curated Collections</span>
+                </h1>
+                <p class="reveal" style="max-width:560px;margin:1rem auto 0;color:var(--text-secondary);font-size:1.1rem;line-height:1.7;">
+                    Discover hand-picked themed collections assembled by top artists and curators. Each collection tells a unique visual story through exceptional digital artwork.
+                </p>
+                <div class="hero-actions reveal">
+                    <a href="#trending" class="btn btn-primary btn-lg magnetic-btn"><i class="uil uil-search"></i> Browse All</a>
+                    <a href="#cta" class="btn btn-outline btn-lg magnetic-btn"><i class="uil uil-plus-circle"></i> Create Collection</a>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Collection Categories -->
-        <h3 class="reveal" style="margin-bottom: 1.5rem;">Browse Categories</h3>
-        <div class="cat-scroll reveal">
-            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Cyberpunk</h4></div></div>
-            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Abstract</h4></div></div>
-            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Fluid</h4></div></div>
-            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Geometric</h4></div></div>
-            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Urban</h4></div></div>
-            <div class="cat-card-small tilt-card"><div class="tilt-card-inner"><img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400&auto=format&fit=crop" alt="Cat"><h4>Neon</h4></div></div>
-        </div>
+    <!-- ═══════════════════════════════════════════════
+         SECTION 1 — FEATURED COLLECTION BANNER
+    ═══════════════════════════════════════════════ -->
+    <section style="padding:4rem 0;">
+        <div class="container">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">SPOTLIGHT</span>
+                    <h2>Featured Collection</h2>
+                </div>
+            </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;" class="reveal">
-            <h2>Trending <span class="text-gradient">Collections</span></h2>
-            <button class="btn btn-outline">View All</button>
-        </div>
-
-        <!-- Collections Grid -->
-        <div class="grid-2 reveal stagger-1" style="margin-bottom: 6rem;">
-            <!-- Collection 1 -->
-            <div class="collection-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="collection-images">
-                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
-                        <div class="collection-sub-images">
-                            <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
-                            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
+            <div class="featured-banner collection-banner reveal-scale">
+                <img loading="lazy" src="IMAGE/LENA.webp"
+                     alt="Cyberpunk Dreams collection cover" class="featured-banner-img">
+                <div class="featured-banner-overlay"></div>
+                <div class="featured-banner-content">
+                    <span class="badge badge-amber"><i class="uil uil-fire"></i> Featured</span>
+                    <h2 class="text-gradient-warm">Cyberpunk Dreams</h2>
+                    <p>A sprawling collection of neon-soaked cityscapes, augmented realities, and dystopian visions. Each piece transports you into a world where technology blurs the line between human and machine.</p>
+                    <div class="featured-stats">
+                        <div class="featured-stat">
+                            <span>Items</span>
+                            <span>234</span>
+                        </div>
+                        <div class="featured-stat">
+                            <span>Floor Price</span>
+                            <span class="text-amber">0.5 ETH</span>
+                        </div>
+                        <div class="featured-stat">
+                            <span>Total Volume</span>
+                            <span>127.4 ETH</span>
+                        </div>
+                        <div class="featured-stat">
+                            <span>Owners</span>
+                            <span>1,892</span>
                         </div>
                     </div>
-                    <div class="collection-info">
-                        <div>
-                            <div class="collection-creator">
-                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @neon_god</span>
+                    <a href="marketplace.html" class="btn btn-primary magnetic-btn"><i class="uil uil-arrow-right"></i> Explore Collection</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 2 — TRENDING COLLECTIONS (6 cards)
+    ═══════════════════════════════════════════════ -->
+    <section id="trending" style="padding:4rem 0;">
+        <div class="container">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">TRENDING</span>
+                    <h2>Trending Collections</h2>
+                </div>
+                <a href="marketplace.html" class="btn btn-outline btn-sm magnetic-btn">View All <i class="uil uil-arrow-right"></i></a>
+            </div>
+
+            <div class="grid-3 stagger">
+
+                <!-- Card 1 — Surreal Worlds -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/liquid dreams.webp"
+                             alt="Surreal Worlds">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Surreal Worlds</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/marcus.webp" alt="Creator">
+                            <span>by <strong class="text-violet">Elena Vasquez</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">182</span>
                             </div>
-                            <h3 style="margin: 0;">Cyberpunk Visions</h3>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.32 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">89.1 ETH</span>
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
-                            <h4 style="margin: 0;">24</h4>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Surrealism</span>
+                            <span class="tag">Dreamscape</span>
+                            <span class="tag">Fantasy</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Card 2 — Neon Nights -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/mia cover.webp"
+                             alt="Neon Nights">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Neon Nights</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/mia.webp" alt="Creator">
+                            <span>by <strong class="text-cyan">Kai Tanaka</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">310</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.18 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">142.7 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Neon</span>
+                            <span class="tag">Cyberpunk</span>
+                            <span class="tag">Night</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 — Abstract Visions -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/michael.webp"
+                             alt="Abstract Visions">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Abstract Visions</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/mp.webp" alt="Creator">
+                            <span>by <strong class="text-amber">Aria Chen</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">95</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.75 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">203.5 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Abstract</span>
+                            <span class="tag">Fluid</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 — Digital Botanica -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/mp1.webp"
+                             alt="Digital Botanica">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Digital Botanica</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/mp2.webp" alt="Creator">
+                            <span>by <strong class="text-violet">Luna Park</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">147</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.22 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">56.3 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Nature</span>
+                            <span class="tag">Botanical</span>
+                            <span class="tag">Organic</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 — Retro Futures -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/mp3.webp"
+                             alt="Retro Futures">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Retro Futures</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/neon genesis.webp" alt="Creator">
+                            <span>by <strong class="text-cyan">Marco Rossi</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">220</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.14 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">64.8 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Retro</span>
+                            <span class="tag">Synthwave</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 — Cosmic Art -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/neon metropolis.webp"
+                             alt="Cosmic Art">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Cosmic Art</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/ocean deapth.webp" alt="Creator">
+                            <span>by <strong class="text-amber">Nova Sterling</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">268</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.41 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">178.2 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Space</span>
+                            <span class="tag">Cosmic</span>
+                            <span class="tag">Nebula</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /grid-3 -->
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 3 — COLLECTION CATEGORIES (8 cards)
+    ═══════════════════════════════════════════════ -->
+    <section style="padding:4rem 0;">
+        <div class="container">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">BROWSE BY</span>
+                    <h2>Collection Categories</h2>
                 </div>
             </div>
 
-            <!-- Collection 2 -->
-            <div class="collection-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="collection-images">
-                        <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
-                        <div class="collection-sub-images">
-                            <img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
-                            <img src="https://images.unsplash.com/photo-1633398813350-98fc1a7707c7?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
-                        </div>
-                    </div>
-                    <div class="collection-info">
-                        <div>
-                            <div class="collection-creator">
-                                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @synthwave</span>
-                            </div>
-                            <h3 style="margin: 0;">Neon Genesis Vol. 1</h3>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
-                            <h4 style="margin: 0;">12</h4>
-                        </div>
-                    </div>
+            <div class="grid-4 stagger">
+
+                <!-- 1 Abstract -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-palette"></i></div>
+                    <h4>Abstract</h4>
+                    <span class="count">1,240 items</span>
                 </div>
-            </div>
-            
-            <!-- Collection 3 -->
-            <div class="collection-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="collection-images">
-                        <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
-                        <div class="collection-sub-images">
-                            <img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
-                            <img src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
-                        </div>
-                    </div>
-                    <div class="collection-info">
-                        <div>
-                            <div class="collection-creator">
-                                <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @fluid_dynamics</span>
-                            </div>
-                            <h3 style="margin: 0;">Liquid State</h3>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
-                            <h4 style="margin: 0;">45</h4>
-                        </div>
-                    </div>
+
+                <!-- 2 3D Renders -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-cube"></i></div>
+                    <h4>3D Renders</h4>
+                    <span class="count">987 items</span>
                 </div>
+
+                <!-- 3 Photography -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-camera"></i></div>
+                    <h4>Photography</h4>
+                    <span class="count">2,150 items</span>
+                </div>
+
+                <!-- 4 Illustration -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-pen"></i></div>
+                    <h4>Illustration</h4>
+                    <span class="count">1,680 items</span>
+                </div>
+
+                <!-- 5 Pixel Art -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-grid"></i></div>
+                    <h4>Pixel Art</h4>
+                    <span class="count">530 items</span>
+                </div>
+
+                <!-- 6 AI Art -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-robot"></i></div>
+                    <h4>AI Art</h4>
+                    <span class="count">3,420 items</span>
+                </div>
+
+                <!-- 7 Generative -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-atom"></i></div>
+                    <h4>Generative</h4>
+                    <span class="count">870 items</span>
+                </div>
+
+                <!-- 8 Cyberpunk -->
+                <div class="glass-panel category-card reveal">
+                    <div class="category-icon"><i class="uil uil-circuit"></i></div>
+                    <h4>Cyberpunk</h4>
+                    <span class="count">1,095 items</span>
+                </div>
+
+            </div><!-- /grid-4 -->
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 4 — RECENTLY CREATED (3 cards)
+    ═══════════════════════════════════════════════ -->
+    <section style="padding:4rem 0;">
+        <div class="container">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">NEW</span>
+                    <h2>Recently Created</h2>
+                </div>
+                <a href="marketplace.html" class="btn btn-outline btn-sm magnetic-btn">See More <i class="uil uil-arrow-right"></i></a>
             </div>
 
-            <!-- Collection 4 -->
-            <div class="collection-card tilt-card">
-                <div class="tilt-card-inner">
-                    <div class="collection-images">
-                        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600&auto=format&fit=crop" class="collection-main-img" alt="Main">
-                        <div class="collection-sub-images">
-                            <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 1">
-                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop" class="collection-sub-img" alt="Sub 2">
+            <div class="grid-3 stagger">
+
+                <!-- Card A — Ethereal Portraits -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/oscar cover.webp"
+                             alt="Ethereal Portraits">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Ethereal Portraits</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/oscar.webp" alt="Creator">
+                            <span>by <strong class="text-violet">Zara Knight</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">42</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.08 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">5.4 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Portrait</span>
+                            <span class="tag">Ethereal</span>
+                            <span class="tag">Glow</span>
                         </div>
                     </div>
-                    <div class="collection-info">
-                        <div>
-                            <div class="collection-creator">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-                                <span style="font-size: 0.9rem; color: var(--text-muted);">by @creative_mind</span>
+                </div>
+
+                <!-- Card B — Glitch Manifesto -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/pixel horizon.webp"
+                             alt="Glitch Manifesto">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Glitch Manifesto</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/priya.webp" alt="Creator">
+                            <span>by <strong class="text-cyan">Dex Morin</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">78</span>
                             </div>
-                            <h3 style="margin: 0;">Abstract Dimensions</h3>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.12 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">18.9 ETH</span>
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Items</p>
-                            <h4 style="margin: 0;">8</h4>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Glitch</span>
+                            <span class="tag">Digital</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Card C — Ocean Depths -->
+                <div class="card tilt-card reveal">
+                    <div class="img-zoom-container collection-cover">
+                        <img loading="lazy" src="IMAGE/quantum fields.webp"
+                             alt="Ocean Depths">
+                    </div>
+                    <div class="card-body">
+                        <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Ocean Depths</h3>
+                        <div class="collection-meta">
+                            <img loading="lazy" src="IMAGE/quantum fragments.webp" alt="Creator">
+                            <span>by <strong class="text-amber">Marina Lowe</strong></span>
+                        </div>
+                        <div class="collection-stats-row">
+                            <div class="collection-stat-item">
+                                <span class="label">Items</span>
+                                <span class="value">63</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Floor</span>
+                                <span class="value">0.15 ETH</span>
+                            </div>
+                            <div class="collection-stat-item">
+                                <span class="label">Volume</span>
+                                <span class="value">22.7 ETH</span>
+                            </div>
+                        </div>
+                        <div class="tag-list" style="margin-top:0.75rem;">
+                            <span class="tag">Ocean</span>
+                            <span class="tag">Aquatic</span>
+                            <span class="tag">Blue</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /grid-3 -->
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         SECTION 5 — START YOUR COLLECTION CTA
+    ═══════════════════════════════════════════════ -->
+    <section id="cta" style="padding:5rem 0 6rem;">
+        <div class="container">
+            <div class="cta-banner reveal-scale">
+                <div style="position:relative;z-index:2;text-align:center;max-width:640px;margin:0 auto;">
+                    <span class="section-label">GET STARTED</span>
+                    <h2 style="font-size:2.4rem;margin-bottom:1rem;">
+                        Start Your Own <span class="text-gradient">Collection</span>
+                    </h2>
+                    <p style="color:var(--text-secondary);font-size:1.05rem;line-height:1.7;margin-bottom:2rem;">
+                        Curate your favorite artworks into themed collections. Share your vision with the world and build a portfolio that reflects your unique artistic taste.
+                    </p>
+                    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                        <a href="signup.html" class="btn btn-primary btn-lg magnetic-btn"><i class="uil uil-rocket"></i> Create Collection</a>
+                        <a href="marketplace.html" class="btn btn-outline btn-lg magnetic-btn">Explore Art</a>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Seasonal Collections & Stats -->
-        <div class="reveal" style="margin-bottom: 6rem; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 4rem;">
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h2>Spring <span class="text-gradient">Showcase</span></h2>
-                <p>Exclusive seasonal drops curated by Stackly.</p>
-            </div>
-            
-            <div class="stats-grid" style="margin-bottom: 4rem;">
-                <div class="stat-item">
-                    <h3 class="counter text-gradient" data-target="1500">0</h3>
-                    <p>Total Collections</p>
-                </div>
-                <div class="stat-item">
-                    <h3 class="counter text-gradient" data-target="8500">0</h3>
-                    <p>Artworks Created</p>
-                </div>
-                <div class="stat-item">
-                    <h3 class="counter text-gradient" data-target="24000">0</h3>
-                    <p>Total Volume (ETH)</p>
-                </div>
-                <div class="stat-item">
-                    <h3 class="counter text-gradient" data-target="120">0</h3>
-                    <p>Curated Artists</p>
-                </div>
-            </div>
-
-            <div class="carousel-container">
-                <div class="carousel-track">
-                    <!-- Seasonal 1 -->
-                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Blossom</h4></div></div>
-                    <!-- Seasonal 2 -->
-                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Pastel Dreams</h4></div></div>
-                    <!-- Seasonal 3 -->
-                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Equinox</h4></div></div>
-                    <!-- Seasonal 4 -->
-                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Rebirth</h4></div></div>
-                    <!-- DUPLICATE -->
-                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Blossom</h4></div></div>
-                    <div class="cat-card-small tilt-card" style="display: inline-block;"><div class="tilt-card-inner" style="height: 120px;"><img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=400&auto=format&fit=crop" alt="Seasonal"><h4>Pastel Dreams</h4></div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CTA Section -->
-        <div class="reveal" style="background: var(--gradient-primary); padding: 4rem; border-radius: var(--radius-lg); text-align: center;">
-            <h2 style="margin-bottom: 1rem;">Create Your Own Collection</h2>
-            <p style="color: white; max-width: 600px; margin: 0 auto 2rem;">Got an amazing set of artworks? Package them into a collection and launch them directly to our community.</p>
-            <a href="signup.html" class="btn magnetic-btn" style="background: white; color: var(--accent-1);">Start Creating</a>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer>
+    <!-- ═══════════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════════ -->
+    <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <a href="index.html" class="logo" style="margin-bottom: 1.5rem;">
-                        <img src="lo.webp" alt="Stackly Logo">
-                    </a>
-                    <p style="margin-bottom: 1.5rem;">The world's first and largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs).</p>
-                    <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-twitter"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-discord"></i></a>
-                        <a href="404.html" style="color: var(--text-muted);"><i class="uil uil-instagram"></i></a>
+                <div class="footer-brand">
+                    <a href="index.html" class="logo"><img src="lo.webp" alt="Stackly"></a>
+                    <p>The world's premier platform for discovering, collecting, and trading exceptional digital art.</p>
+                    <div class="footer-social">
+                        <a href="404.html"><i class="uil uil-twitter-alt"></i></a>
+                        <a href="404.html"><i class="uil uil-instagram"></i></a>
+                        <a href="404.html"><i class="uil uil-discord"></i></a>
+                        <a href="404.html"><i class="uil uil-youtube"></i></a>
                     </div>
                 </div>
                 <div class="footer-col">
                     <h4>Marketplace</h4>
-                    <ul class="footer-links">
-                        <li><a href="404.html">All Artworks</a></li>
-                        <li><a href="404.html">New Releases</a></li>
-                        <li><a href="404.html">Top Artists</a></li>
-                        <li><a href="404.html">Collections</a></li>
-                    </ul>
+                    <ul>
+                        <li><a href="marketplace.html">All Artworks</a></li>
+                        <li><a href="collections.html">Collections</a></li>
+                        <li><a href="404.html">Trending</a></li>
+                        <li><a href="404.html">New Drops</a></li>
+                    <li class="mobile-login-btn"><a href="login.html" class="btn btn-primary" style="display:block;text-align:center;">Login</a></li>
+            </ul>
                 </div>
                 <div class="footer-col">
-                    <h4>My Account</h4>
-                    <ul class="footer-links">
-                        <li><a href="login.html">Profile</a></li>
-                        <li><a href="404.html">Favorites</a></li>
-                        <li><a href="404.html">My Collections</a></li>
-                        <li><a href="404.html">Settings</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="artists.html">Artists</a></li>
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="404.html">Careers</a></li>
+                        <li><a href="404.html">Blog</a></li>
                         <li><a href="contact.html">Contact</a></li>
+                    <li class="mobile-login-btn"><a href="login.html" class="btn btn-primary" style="display:block;text-align:center;">Login</a></li>
+            </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="404.html">Help Center</a></li>
+                        <li><a href="404.html">Terms of Service</a></li>
                         <li><a href="404.html">Privacy Policy</a></li>
-                    </ul>
+                        <li><a href="404.html">FAQ</a></li>
+                    <li class="mobile-login-btn"><a href="login.html" class="btn btn-primary" style="display:block;text-align:center;">Login</a></li>
+            </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h4>Stay Updated</h4>
+                    <p>Get the latest drops and exclusive offers delivered to your inbox.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+                    </form>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2026 Stackly. All rights reserved.</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <a href="404.html">Terms</a>
+                <div class="footer-bottom-links">
                     <a href="404.html">Privacy</a>
+                    <a href="404.html">Terms</a>
+                    <a href="404.html">Cookies</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="js/main.js?v=2"></script>
+    <script src="js/main.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
